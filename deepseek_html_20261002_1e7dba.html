@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Актуализация · Урок 3</title>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['$','$'],['\\(','\\)']],
+    displayMath: [['$$','$$'],['\\[','\\]']]
+  },
+  svg: {fontCache: 'global'},
+  options: {
+    skipHtmlTags: ['script','noscript','style','textarea','pre','code']
+  }
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root{
+    --orange:#ea580c;
+    --orange-dark:#c2410c;
+    --orange-light:#ffedd5;
+    --amber:#f59e0b;
+    --amber-dark:#d97706;
+    --amber-light:#fef3c7;
+    --ok:#10b981;
+    --ok-light:#d1fae5;
+    --err:#ef4444;
+    --err-light:#fee2e2;
+    --text:#1e293b;
+    --muted:#78716c;
+    --border:#fed7aa;
+    --grid-line:#fed7aa;
+  }
+  *{box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif;}
+  html,body{
+    margin:0;padding:0;height:100%;overflow:hidden;
+  }
+  body{
+    background:
+      radial-gradient(1200px 600px at 5% -5%, #ffedd5 0%, transparent 55%),
+      radial-gradient(900px 500px at 100% 100%, #fef3c7 0%, transparent 55%),
+      #fffbf5;
+    color:var(--text);
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+
+  .bg-leaf{position:fixed;pointer-events:none;z-index:0;user-select:none;}
+  .bg-leaf.l1{top:6%;left:3%;transform:rotate(-25deg);font-size:80px;opacity:.14;}
+  .bg-leaf.l2{top:35%;right:4%;transform:rotate(35deg);font-size:110px;opacity:.1;}
+  .bg-leaf.l3{bottom:10%;left:10%;transform:rotate(15deg);font-size:90px;opacity:.12;}
+  .bg-leaf.l4{bottom:5%;right:15%;transform:rotate(-45deg);font-size:70px;opacity:.13;}
+  .bg-leaf.l5{top:15%;right:35%;transform:rotate(-10deg);font-size:60px;opacity:.11;}
+  .bg-leaf.l6{bottom:40%;left:40%;transform:rotate(120deg);font-size:70px;opacity:.09;}
+  .bg-leaf.l7{top:70%;left:2%;transform:rotate(60deg);font-size:65px;opacity:.1;}
+  .bg-leaf.l8{top:5%;right:8%;transform:rotate(-60deg);font-size:80px;opacity:.12;}
+
+  /* HEADER */
+  header{
+    padding:10px 24px;
+    display:flex;justify-content:space-between;align-items:center;
+    background:rgba(255,251,245,.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+    flex-wrap:wrap;gap:10px;
+    position:relative;z-index:10;
+    flex-shrink:0;
+  }
+  .header-title{
+    font-size:13px;font-weight:800;
+    color:var(--orange-dark);
+  }
+  .header-title span{color:var(--muted);font-weight:600;margin-left:8px;}
+  .progress-pills{display:flex;gap:6px;align-items:center;}
+  .progress-pill{
+    height:28px;min-width:28px;padding:0 11px;border-radius:14px;
+    background:#fff;border:2px solid var(--border);
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:800;color:var(--muted);
+    transition:.3s;cursor:pointer;
+  }
+  .progress-pill:hover{border-color:var(--orange);color:var(--orange);}
+  .progress-pill.active{
+    background:linear-gradient(135deg,var(--orange),var(--amber));
+    color:#fff;border-color:transparent;
+  }
+  .progress-pill.done{
+    background:var(--ok-light);color:var(--ok);
+    border-color:var(--ok);
+  }
+
+  /* MAIN */
+  main{
+    flex:1;
+    padding:14px 20px 80px;
+    display:flex;justify-content:center;
+    position:relative;z-index:5;
+    min-height:0;
+    overflow:hidden;
+  }
+  .slide{
+    display:none;
+    background:#fffdf9;border-radius:20px;
+    padding:20px 32px;
+    box-shadow:0 14px 50px rgba(234,88,12,.12);
+    border:1px solid var(--border);
+    width:100%;max-width:1200px;
+    position:relative;
+    overflow:hidden;
+    height:100%;
+    flex-direction:column;
+  }
+  .slide.active{display:flex;}
+
+  .slide::before{
+    content:'';position:absolute;top:-50px;right:-50px;
+    width:180px;height:180px;
+    background:radial-gradient(circle, rgba(254,215,170,.5) 0%, transparent 70%);
+    pointer-events:none;
+  }
+
+  /* SLIDE HEADER */
+  .slide-header{
+    flex-shrink:0;
+    margin-bottom:12px;
+    position:relative;z-index:2;
+  }
+  .slide-tag{
+    display:inline-block;
+    background:var(--amber-light);color:var(--amber-dark);
+    padding:4px 12px;border-radius:16px;
+    font-size:11px;font-weight:700;margin-bottom:6px;
+    border:1px solid rgba(245,158,11,.3);
+  }
+  .slide h2{
+    font-size:20px;margin:0 0 3px;color:var(--orange-dark);font-weight:800;
+  }
+  .slide .subtitle{
+    color:var(--muted);font-size:12px;margin:0;
+  }
+
+  /* CAROUSEL */
+  .carousel{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    min-height:0;
+    gap:12px;
+    position:relative;z-index:2;
+  }
+
+  .question-stage{
+    flex:1;
+    width:100%;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    min-height:0;
+    overflow:auto;
+    padding:4px 0;
+    position:relative;
+  }
+
+  .question-card{
+    display:none;
+    width:100%;
+    max-width:820px;
+    background:#fff;
+    border:2px solid var(--border);
+    border-radius:20px;
+    padding:20px 28px;
+    box-shadow:0 8px 28px rgba(234,88,12,.08);
+    flex-direction:column;
+    gap:12px;
+    flex-shrink:0;
+  }
+  .question-card.active{display:flex;}
+
+  .question-card .q-head{
+    display:flex;align-items:center;gap:12px;
+  }
+  .question-card .q-num{
+    display:inline-flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,var(--orange),var(--amber));
+    color:#fff;
+    font-weight:800;font-size:14px;
+    width:32px;height:32px;border-radius:10px;
+    flex-shrink:0;
+  }
+  .question-card .q-label{
+    font-size:11px;font-weight:800;
+    color:var(--muted);text-transform:uppercase;
+    letter-spacing:.6px;
+  }
+
+  .question-card .q-expr{
+    font-size:22px;
+    font-weight:600;
+    line-height:1.5;
+    text-align:center;
+    padding:12px 16px;
+    background:linear-gradient(135deg,#fffbf5,#fff7ed);
+    border-radius:12px;
+    border:2px solid var(--border);
+    color:var(--text);
+    min-height:70px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .options{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:8px;
+  }
+  .options.cols-2{grid-template-columns:1fr 1fr;}
+  .option{
+    background:#fff;
+    border:2px solid var(--border);
+    border-radius:12px;
+    padding:10px 14px;
+    font-size:16px;
+    cursor:pointer;
+    transition:.2s;
+    display:flex;align-items:center;gap:12px;
+    font-weight:500;
+    line-height:1.4;
+  }
+  .option:hover:not(.locked){
+    border-color:var(--orange);
+    background:#fff7ed;
+  }
+  .option .marker{
+    width:26px;height:26px;border-radius:50%;
+    border:2px solid var(--border);
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:800;flex-shrink:0;
+    color:var(--muted);
+    background:#fff;
+  }
+  .option.correct{
+    background:var(--ok-light);border-color:var(--ok);
+    color:#065f46;font-weight:700;
+  }
+  .option.correct .marker{background:var(--ok);border-color:var(--ok);color:#fff;}
+  .option.wrong{
+    background:var(--err-light);border-color:var(--err);
+    color:#991b1b;animation:shake .4s;
+  }
+  .option.wrong .marker{background:var(--err);border-color:var(--err);color:#fff;}
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-8px);}
+    75%{transform:translateX(8px);}
+  }
+
+  .input-row{
+    display:flex;gap:12px;align-items:center;
+    flex-wrap:wrap;justify-content:center;
+  }
+  .input-row input{
+    flex:1;min-width:200px;max-width:400px;
+    padding:12px 16px;
+    border:2px solid var(--border);border-radius:12px;
+    font-size:16px;font-family:inherit;
+    background:#fff;text-align:center;font-weight:600;
+  }
+  .input-row input:focus{
+    outline:none;border-color:var(--orange);
+    box-shadow:0 0 0 4px rgba(234,88,12,.12);
+  }
+  .input-row input.correct{border-color:var(--ok);background:var(--ok-light);}
+  .input-row input.wrong{border-color:var(--err);background:var(--err-light);}
+  .check-btn{
+    padding:12px 22px;border:none;border-radius:12px;
+    background:linear-gradient(135deg,var(--orange),var(--amber));
+    color:#fff;font-size:14px;font-weight:700;
+    cursor:pointer;white-space:nowrap;
+  }
+
+  .result-msg{
+    margin-top:6px;font-size:13px;font-weight:700;
+    min-height:18px;text-align:center;
+  }
+  .result-msg.ok{color:var(--ok);}
+  .result-msg.err{color:var(--err);}
+
+  .order-steps{display:flex;flex-direction:column;gap:6px;}
+  .step-card{
+    background:#fff;border:2px solid var(--border);border-radius:10px;
+    padding:9px 12px;font-size:14px;cursor:pointer;
+    display:flex;align-items:center;gap:9px;
+    user-select:none;line-height:1.35;
+    transition:.2s;
+  }
+  .step-card:hover{border-color:var(--orange);background:#fff7ed;}
+  .step-card.picked{
+    background:linear-gradient(135deg,#fff7ed,#ffedd5);
+    border-color:var(--orange);cursor:default;
+  }
+  .step-card .step-order{
+    width:24px;height:24px;border-radius:50%;
+    background:#fff;border:2px solid var(--border);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:12px;color:var(--muted);
+    flex-shrink:0;
+  }
+  .step-card.picked .step-order{
+    background:linear-gradient(135deg,var(--orange),var(--amber));
+    color:#fff;border-color:transparent;
+  }
+  .step-card .step-text{flex:1;font-weight:500;}
+  .step-reset{
+    margin-top:8px;padding:8px 16px;
+    border:2px solid var(--orange);background:#fff;
+    color:var(--orange);border-radius:10px;
+    font-size:13px;font-weight:700;cursor:pointer;
+    align-self:center;
+  }
+  .step-reset:hover{background:var(--orange-light);}
+
+  .carousel-nav{
+    display:flex;align-items:center;gap:14px;
+    flex-shrink:0;background:#fff;
+    padding:6px 14px;border-radius:30px;
+    border:2px solid var(--border);
+  }
+  .carousel-nav button{
+    width:36px;height:36px;border-radius:50%;
+    border:none;
+    background:linear-gradient(135deg,var(--orange),var(--amber));
+    color:#fff;font-size:16px;font-weight:800;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+  }
+  .carousel-nav button:disabled{
+    background:#e5e7eb;color:#9ca3af;cursor:not-allowed;
+  }
+  .question-dots{display:flex;gap:7px;align-items:center;}
+  .q-dot{
+    width:10px;height:10px;border-radius:50%;
+    background:var(--border);cursor:pointer;transition:.3s;
+  }
+  .q-dot.active{background:var(--orange);transform:scale(1.3);}
+  .q-dot.done{background:var(--ok);}
+  .carousel-counter{
+    font-size:12px;font-weight:800;
+    color:var(--orange-dark);min-width:46px;text-align:center;
+  }
+
+  /* BUILD */
+  .build-wrapper{
+    display:grid;grid-template-columns:1.1fr 1fr;
+    gap:18px;flex:1;min-height:0;width:100%;max-width:1100px;
+    position:relative;z-index:2;
+  }
+  @media (max-width:900px){.build-wrapper{grid-template-columns:1fr;}}
+
+  .build-zone{
+    background:#fff;border:2px dashed var(--amber);border-radius:14px;
+    padding:14px 16px;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size:22px 22px;
+    display:flex;flex-direction:column;
+  }
+  .build-target{
+    font-size:20px;font-weight:600;text-align:center;
+    margin:6px 0 12px;
+  }
+  .build-slots{display:flex;flex-direction:column;gap:7px;flex:1;}
+  .build-slot{
+    background:rgba(255,255,255,.85);
+    border:2px dashed var(--border);border-radius:10px;
+    padding:9px 12px;min-height:44px;
+    display:flex;align-items:center;gap:10px;font-size:16px;
+  }
+  .build-slot.filled{
+    background:#fff7ed;border-style:solid;
+    border-color:var(--orange);color:var(--orange-dark);font-weight:600;
+  }
+  .build-slot .slot-num{
+    width:24px;height:24px;border-radius:50%;
+    background:var(--orange-light);color:var(--orange-dark);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:11px;flex-shrink:0;
+  }
+  .build-slot.filled .slot-num{background:var(--orange);color:#fff;}
+  .build-slot .slot-content{flex:1;}
+  .build-slot .remove-btn{
+    background:transparent;border:none;
+    color:var(--err);cursor:pointer;font-size:15px;font-weight:800;
+    padding:0 5px;
+  }
+
+  .pieces-pool-wrap{display:flex;flex-direction:column;gap:10px;min-height:0;}
+  .pieces-label{
+    font-size:11px;font-weight:800;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.5px;
+  }
+  .pieces-pool{
+    display:flex;flex-wrap:wrap;gap:9px;padding:12px;
+    background:#fffbf5;border-radius:12px;
+    border:2px solid var(--border);flex:1;align-content:flex-start;
+  }
+  .piece{
+    background:#fff;border:2px solid var(--border);border-radius:10px;
+    padding:9px 14px;font-size:15px;font-weight:600;
+    cursor:pointer;transition:.2s;user-select:none;
+    display:flex;align-items:center;gap:10px;
+  }
+  .piece:hover{border-color:var(--orange);background:#fff7ed;}
+  .piece.used{opacity:.3;pointer-events:none;text-decoration:line-through;}
+
+  .piece-letter{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:26px;height:26px;
+    border-radius:50%;
+    background:linear-gradient(135deg,var(--orange),var(--amber));
+    color:#fff;
+    font-weight:800;
+    font-size:13px;
+    flex-shrink:0;
+  }
+
+  .build-slot .slot-letter{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:26px;height:26px;
+    border-radius:50%;
+    background:linear-gradient(135deg,var(--orange),var(--amber));
+    color:#fff;
+    font-weight:800;
+    font-size:13px;
+    flex-shrink:0;
+    margin-right:8px;
+  }
+
+  .build-actions{display:flex;gap:9px;flex-wrap:wrap;}
+  .build-actions button{
+    padding:10px 18px;border:none;border-radius:10px;
+    font-size:13px;font-weight:700;cursor:pointer;
+  }
+  .build-actions .btn-check{
+    background:linear-gradient(135deg,var(--orange),var(--amber));
+    color:#fff;
+  }
+  .build-actions .btn-reset{
+    background:#fff;color:var(--orange);border:2px solid var(--orange);
+  }
+  .build-result{
+    margin-top:8px;padding:10px 16px;border-radius:10px;
+    font-size:13px;font-weight:700;display:none;
+  }
+  .build-result.show{display:block;}
+  .build-result.ok{background:var(--ok-light);color:#065f46;border-left:4px solid var(--ok);}
+  .build-result.err{background:var(--err-light);color:#991b1b;border-left:4px solid var(--err);}
+
+  /* NAV */
+  nav{
+    position:fixed;bottom:0;left:0;right:0;
+    padding:9px 22px;
+    background:rgba(255,251,245,.9);
+    backdrop-filter:blur(10px);
+    border-top:1px solid var(--border);
+    display:flex;justify-content:space-between;align-items:center;gap:14px;
+    z-index:100;
+  }
+  nav button{
+    padding:8px 20px;border:none;border-radius:9px;
+    font-size:13px;font-weight:700;cursor:pointer;
+  }
+  nav .nav-prev{
+    background:#fff;color:var(--orange);border:2px solid var(--orange);
+  }
+  nav .nav-next{
+    background:linear-gradient(135deg,var(--orange),var(--amber));
+    color:#fff;
+  }
+  nav button:disabled{opacity:.4;cursor:not-allowed;}
+  nav .nav-info{font-size:12px;font-weight:700;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<span class="bg-leaf l1">🌿</span>
+<span class="bg-leaf l2">🍃</span>
+<span class="bg-leaf l3">🌱</span>
+<span class="bg-leaf l4">🌿</span>
+<span class="bg-leaf l5">🍃</span>
+<span class="bg-leaf l6">🌱</span>
+<span class="bg-leaf l7">🌿</span>
+<span class="bg-leaf l8">🍃</span>
+
+<header>
+  <div class="header-title">Актуализация · Урок 3 <span>· Преобразование рациональных выражений</span></div>
+  <div class="progress-pills">
+    <div class="progress-pill active" data-slide="0">1</div>
+    <div class="progress-pill" data-slide="1">2</div>
+    <div class="progress-pill" data-slide="2">3</div>
+    <div class="progress-pill" data-slide="3">4</div>
+    <div class="progress-pill" data-slide="4">5</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- СЛАЙД 1 -->
+  <section class="slide active">
+    <div class="slide-header">
+      <span class="slide-tag">Задание 1 · 3 мин</span>
+      <h2>Представьте в виде несократимой дроби</h2>
+      <p class="subtitle">Выберите верный ответ. Помните: сокращать можно только множители.</p>
+    </div>
+
+    <div class="carousel" data-carousel="1">
+      <div class="question-stage">
+
+        <div class="question-card active">
+          <div class="q-head"><span class="q-num">а</span><span class="q-label">Сократите дробь</span></div>
+          <div class="q-expr">$\dfrac{18a^2}{6a^2}$</div>
+          <div class="options cols-2">
+            <div class="option" data-correct="false"><span class="marker">А</span><span>$3a$</span></div>
+            <div class="option" data-correct="true"><span class="marker">Б</span><span>$3$</span></div>
+            <div class="option" data-correct="false"><span class="marker">В</span><span>$3a^2$</span></div>
+          </div>
+        </div>
+
+        <div class="question-card">
+          <div class="q-head"><span class="q-num">б</span><span class="q-label">Сократите дробь</span></div>
+          <div class="q-expr">$\dfrac{a}{k} \cdot \dfrac{nk}{a^2b}$</div>
+          <div class="options cols-2">
+            <div class="option" data-correct="true"><span class="marker">А</span><span>$\dfrac{n}{ab}$</span></div>
+            <div class="option" data-correct="false"><span class="marker">Б</span><span>$\dfrac{nk}{a^2b}$</span></div>
+            <div class="option" data-correct="false"><span class="marker">В</span><span>$\dfrac{n}{a^2b}$</span></div>
+          </div>
+        </div>
+
+        <div class="question-card">
+          <div class="q-head"><span class="q-num">в</span><span class="q-label">Сократите дробь</span></div>
+          <div class="q-expr">$\dfrac{7}{3a} \cdot \dfrac{2b}{7}$</div>
+          <div class="options cols-2">
+            <div class="option" data-correct="true"><span class="marker">А</span><span>$\dfrac{2b}{3a}$</span></div>
+            <div class="option" data-correct="false"><span class="marker">Б</span><span>$\dfrac{14b}{21a}$</span></div>
+            <div class="option" data-correct="false"><span class="marker">В</span><span>$\dfrac{2b}{21a}$</span></div>
+          </div>
+        </div>
+
+        <div class="question-card">
+          <div class="q-head"><span class="q-num">г</span><span class="q-label">Сократите дробь</span></div>
+          <div class="q-expr">$\dfrac{2}{m^2} \cdot m^3$</div>
+          <div class="options cols-2">
+            <div class="option" data-correct="false"><span class="marker">А</span><span>$2m^5$</span></div>
+            <div class="option" data-correct="true"><span class="marker">Б</span><span>$2m$</span></div>
+            <div class="option" data-correct="false"><span class="marker">В</span><span>$2m^3$</span></div>
+          </div>
+        </div>
+
+        <div class="question-card">
+          <div class="q-head"><span class="q-num">д</span><span class="q-label">Сократите дробь</span></div>
+          <div class="q-expr">$\dfrac{5x^3}{2} : 5x^3$</div>
+          <div class="options cols-2">
+            <div class="option" data-correct="false"><span class="marker">А</span><span>$25x^6$</span></div>
+            <div class="option" data-correct="true"><span class="marker">Б</span><span>$\dfrac{1}{2}$</span></div>
+            <div class="option" data-correct="false"><span class="marker">В</span><span>$2$</span></div>
+          </div>
+        </div>
+
+      </div>
+      <div class="carousel-nav">
+        <button onclick="carouselPrev(0)">←</button>
+        <div class="question-dots" data-carousel-dots></div>
+        <div class="carousel-counter" data-carousel-counter>1 / 5</div>
+        <button onclick="carouselNext(0)">→</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- СЛАЙД 2 -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag">Задание 2 · 3 мин</span>
+      <h2>Наименьший общий знаменатель</h2>
+      <p class="subtitle">Найдите НОЗ для каждой пары дробей.</p>
+    </div>
+
+    <div class="carousel" data-carousel="2">
+      <div class="question-stage">
+
+        <div class="question-card active">
+          <div class="q-head"><span class="q-num">а</span><span class="q-label">НОЗ для дробей</span></div>
+          <div class="q-expr">$\dfrac{1}{x}$ и $\dfrac{1}{y}$</div>
+          <div class="options cols-2">
+            <div class="option" data-correct="false"><span class="marker">А</span><span>$x+y$</span></div>
+            <div class="option" data-correct="true"><span class="marker">Б</span><span>$xy$</span></div>
+            <div class="option" data-correct="false"><span class="marker">В</span><span>$x-y$</span></div>
+          </div>
+        </div>
+
+        <div class="question-card">
+          <div class="q-head"><span class="q-num">б</span><span class="q-label">НОЗ для дробей</span></div>
+          <div class="q-expr">$x$, $\dfrac{1}{x}$ и $\dfrac{1}{y}$</div>
+          <div class="options cols-2">
+            <div class="option" data-correct="false"><span class="marker">А</span><span>$x$</span></div>
+            <div class="option" data-correct="true"><span class="marker">Б</span><span>$xy$</span></div>
+            <div class="option" data-correct="false"><span class="marker">В</span><span>$x^2y$</span></div>
+          </div>
+        </div>
+
+        <div class="question-card">
+          <div class="q-head"><span class="q-num">в</span><span class="q-label">НОЗ для дробей</span></div>
+          <div class="q-expr">$\dfrac{x}{y}$, $\dfrac{y}{x}$ и $\dfrac{y}{x^2}$</div>
+          <div class="options cols-2">
+            <div class="option" data-correct="false"><span class="marker">А</span><span>$xy$</span></div>
+            <div class="option" data-correct="true"><span class="marker">Б</span><span>$x^2y$</span></div>
+            <div class="option" data-correct="false"><span class="marker">В</span><span>$x^2y^2$</span></div>
+          </div>
+        </div>
+
+        <div class="question-card">
+          <div class="q-head"><span class="q-num">г</span><span class="q-label">НОЗ для дробей</span></div>
+          <div class="q-expr">$\dfrac{1}{c-1}$ и $\dfrac{1}{1-c}$</div>
+          <div class="options cols-2">
+            <div class="option" data-correct="false"><span class="marker">А</span><span>$(c-1)(1-c)$</span></div>
+            <div class="option" data-correct="true"><span class="marker">Б</span><span>$c-1$</span></div>
+            <div class="option" data-correct="false"><span class="marker">В</span><span>$c+1$</span></div>
+          </div>
+        </div>
+
+        <div class="question-card">
+          <div class="q-head"><span class="q-num">д</span><span class="q-label">НОЗ для дробей</span></div>
+          <div class="q-expr">$\dfrac{1}{c-1}$ и $\dfrac{1}{1+c}$</div>
+          <div class="options cols-2">
+            <div class="option" data-correct="false"><span class="marker">А</span><span>$c$</span></div>
+            <div class="option" data-correct="true"><span class="marker">Б</span><span>$(c-1)(c+1)$</span></div>
+            <div class="option" data-correct="false"><span class="marker">В</span><span>$c^2+1$</span></div>
+          </div>
+        </div>
+
+      </div>
+      <div class="carousel-nav">
+        <button onclick="carouselPrev(1)">←</button>
+        <div class="question-dots" data-carousel-dots></div>
+        <div class="carousel-counter" data-carousel-counter>1 / 5</div>
+        <button onclick="carouselNext(1)">→</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- СЛАЙД 3 -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag">Задание 3 · 3 мин</span>
+      <h2>Допустимые значения переменной</h2>
+      <p class="subtitle">Впишите значения переменной, при которых знаменатель обращается в нуль.</p>
+    </div>
+
+    <div class="carousel" data-carousel="3">
+      <div class="question-stage">
+
+        <div class="question-card active">
+          <div class="q-head"><span class="q-num">а</span><span class="q-label">ОДЗ дроби</span></div>
+          <div class="q-expr">$\dfrac{x}{x+1}$</div>
+          <div class="input-row">
+            <input type="text" id="odz1" placeholder="x ≠ ...">
+            <button class="check-btn" onclick="checkInput('odz1', ['-1'], 'x ≠ −1')">Проверить</button>
+          </div>
+          <div class="result-msg" id="odz1-res"></div>
+        </div>
+
+        <div class="question-card">
+          <div class="q-head"><span class="q-num">б</span><span class="q-label">ОДЗ дроби</span></div>
+          <div class="q-expr">$\dfrac{9}{x}$</div>
+          <div class="input-row">
+            <input type="text" id="odz2" placeholder="x ≠ ...">
+            <button class="check-btn" onclick="checkInput('odz2', ['0'], 'x ≠ 0')">Проверить</button>
+          </div>
+          <div class="result-msg" id="odz2-res"></div>
+        </div>
+
+        <div class="question-card">
+          <div class="q-head"><span class="q-num">в</span><span class="q-label">ОДЗ дроби</span></div>
+          <div class="q-expr">$\dfrac{5x}{x^2 - 9}$</div>
+          <div class="input-row">
+            <input type="text" id="odz3" placeholder="x ≠ ...">
+            <button class="check-btn" onclick="checkInput('odz3', ['-3;3','-3,3','3;-3','3,-3','±3'], 'x ≠ −3 и x ≠ 3')">Проверить</button>
+          </div>
+          <div class="result-msg" id="odz3-res"></div>
+        </div>
+
+        <div class="question-card">
+          <div class="q-head"><span class="q-num">г</span><span class="q-label">ОДЗ дроби</span></div>
+          <div class="q-expr">$\dfrac{x^2 - 4}{x^2 + 4}$</div>
+          <div class="input-row">
+            <input type="text" id="odz4" placeholder="x ≠ ...">
+            <button class="check-btn" onclick="checkInput('odz4', ['любое','все','r','нет','-'], 'Любое число (знаменатель всегда > 0)')">Проверить</button>
+          </div>
+          <div class="result-msg" id="odz4-res"></div>
+        </div>
+
+      </div>
+      <div class="carousel-nav">
+        <button onclick="carouselPrev(2)">←</button>
+        <div class="question-dots" data-carousel-dots></div>
+        <div class="carousel-counter" data-carousel-counter>1 / 4</div>
+        <button onclick="carouselNext(2)">→</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- СЛАЙД 4. ПОРЯДОК ДЕЙСТВИЙ — мягкая проверка -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag">Задание 4 · 4 мин</span>
+      <h2>Укажите порядок преобразования</h2>
+      <p class="subtitle">Нажимайте на шаги в правильном порядке. Номера появятся автоматически. Возможны разные верные последовательности!</p>
+    </div>
+
+    <div class="carousel" data-carousel="4">
+      <div class="question-stage">
+
+        <!-- Задание а -->
+        <div class="question-card active">
+          <div class="q-head"><span class="q-num">а</span><span class="q-label">Расставь порядок</span></div>
+          <div class="q-expr">$\dfrac{1}{a-2} : \dfrac{4a}{a^2 - 4} - \dfrac{a-1}{a}$</div>
+          <!--
+            Верные последовательности для задания а:
+            - 1→2→3→4 (разложить, заменить деление, сократить, вычесть)
+            - 2→1→3→4 (сначала заменить деление, потом разложить — тоже верно!)
+            Шаги 3 и 4 жёстко фиксированы после 1 и 2.
+          -->
+          <div class="order-steps" data-order="a" data-valid="1,2,3,4|2,1,3,4">
+            <div class="step-card" data-step="1"><span class="step-order"></span><span class="step-text">Разложить $a^2 - 4 = (a-2)(a+2)$</span></div>
+            <div class="step-card" data-step="2"><span class="step-order"></span><span class="step-text">Заменить деление умножением на обратную дробь</span></div>
+            <div class="step-card" data-step="3"><span class="step-order"></span><span class="step-text">Сократить первую часть</span></div>
+            <div class="step-card" data-step="4"><span class="step-order"></span><span class="step-text">Привести к общему знаменателю и вычесть</span></div>
+          </div>
+          <button class="step-reset" onclick="resetOrder('a')">↺ Сбросить</button>
+        </div>
+
+        <!-- Задание б -->
+        <div class="question-card">
+          <div class="q-head"><span class="q-num">б</span><span class="q-label">Расставь порядок</span></div>
+          <div class="q-expr">$\left( \dfrac{a}{b} + \dfrac{b}{a} \right) \cdot ab$</div>
+          <!--
+            Верные последовательности: 1→2→3 (общий знаменатель → сложить → умножить)
+            Других вариантов нет.
+          -->
+          <div class="order-steps" data-order="b" data-valid="1,2,3">
+            <div class="step-card" data-step="1"><span class="step-order"></span><span class="step-text">Привести дроби в скобке к знаменателю $ab$</span></div>
+            <div class="step-card" data-step="2"><span class="step-order"></span><span class="step-text">Сложить дроби в скобке</span></div>
+            <div class="step-card" data-step="3"><span class="step-order"></span><span class="step-text">Умножить на $ab$ и сократить</span></div>
+          </div>
+          <button class="step-reset" onclick="resetOrder('b')">↺ Сбросить</button>
+        </div>
+
+        <!-- Задание в -->
+        <div class="question-card">
+          <div class="q-head"><span class="q-num">в</span><span class="q-label">Расставь порядок</span></div>
+          <div class="q-expr">$\dfrac{\dfrac{1}{y} + \dfrac{1}{x}}{\dfrac{x}{y} - \dfrac{y}{x}}$</div>
+          <!--
+            Верные последовательности:
+            - 1→2→3→4 (числитель, знаменатель, деление, сократить)
+            - 2→1→3→4 (сначала знаменатель — тоже верно)
+            Шаги 3 и 4 фиксированы после 1 и 2.
+          -->
+          <div class="order-steps" data-order="c" data-valid="1,2,3,4|2,1,3,4">
+            <div class="step-card" data-step="1"><span class="step-order"></span><span class="step-text">Упростить числитель: $\dfrac{1}{y} + \dfrac{1}{x} = \dfrac{x+y}{xy}$</span></div>
+            <div class="step-card" data-step="2"><span class="step-order"></span><span class="step-text">Упростить знаменатель: $\dfrac{x}{y} - \dfrac{y}{x} = \dfrac{x^2-y^2}{xy}$</span></div>
+            <div class="step-card" data-step="3"><span class="step-order"></span><span class="step-text">Заменить деление умножением на обратную дробь</span></div>
+            <div class="step-card" data-step="4"><span class="step-order"></span><span class="step-text">Сократить и разложить $x^2 - y^2$</span></div>
+          </div>
+          <button class="step-reset" onclick="resetOrder('c')">↺ Сбросить</button>
+        </div>
+
+      </div>
+      <div class="carousel-nav">
+        <button onclick="carouselPrev(3)">←</button>
+        <div class="question-dots" data-carousel-dots></div>
+        <div class="carousel-counter" data-carousel-counter>1 / 3</div>
+        <button onclick="carouselNext(3)">→</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- СЛАЙД 5. СОБЕРИ РЕШЕНИЕ С БУКВАМИ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag">Задание 5 · 4 мин · Интерактив</span>
+      <h2>Собери решение по шагам</h2>
+      <p class="subtitle">Нажимай на кусочки с буквами в правильном порядке. Проговаривай: «1 шаг — Б, 2 шаг — Г».</p>
+    </div>
+
+    <div class="carousel" style="justify-content:flex-start;padding-top:8px;">
+      <div class="build-wrapper">
+        <div class="build-zone">
+          <div class="build-target">$\dfrac{a}{b} - \dfrac{b}{a} = \;?$</div>
+          <div class="build-slots" id="buildSlots"></div>
+        </div>
+        <div class="pieces-pool-wrap">
+          <div class="pieces-label">📦 Кусочки решения — нажимай, чтобы добавить:</div>
+          <div class="pieces-pool" id="piecesPool"></div>
+          <div class="build-actions">
+            <button class="btn-check" onclick="checkBuild()">✓ Проверить</button>
+            <button class="btn-reset" onclick="resetBuild()">↺ Сбросить</button>
+          </div>
+          <div class="build-result" id="buildResult"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<nav>
+  <button class="nav-prev" id="navPrev" onclick="changeSlide(-1)" disabled>← Назад</button>
+  <div class="nav-info" id="navInfo">Слайд 1 из 5</div>
+  <button class="nav-next" id="navNext" onclick="changeSlide(1)">Далее →</button>
+</nav>
+
+<script>
+/* ============================================================
+   ОТЛОЖЕННЫЙ РЕНДЕР MATHJAX
+   ============================================================ */
+function renderMathSoon(){
+  requestAnimationFrame(function(){
+    setTimeout(function(){
+      if(window.MathJax && MathJax.typesetPromise){
+        MathJax.typesetPromise().catch(function(err){
+          console.log('MathJax error:', err);
+        });
+      }
+    }, 30);
+  });
+}
+
+/* ============================================================
+   НАВИГАЦИЯ ПО СЛАЙДАМ
+   ============================================================ */
+var current = 0;
+var slides = document.querySelectorAll('.slide');
+var total = slides.length;
+var prevBtn = document.getElementById('navPrev');
+var nextBtn = document.getElementById('navNext');
+var navInfo = document.getElementById('navInfo');
+var pills = document.querySelectorAll('.progress-pill');
+
+function showSlide(i){
+  for(var idx = 0; idx < slides.length; idx++){
+    slides[idx].classList.toggle('active', idx === i);
+  }
+  for(var idx = 0; idx < pills.length; idx++){
+    pills[idx].classList.toggle('active', idx === i);
+    pills[idx].classList.toggle('done', idx < i);
+  }
+  prevBtn.disabled = (i === 0);
+  nextBtn.disabled = (i === total - 1);
+  navInfo.textContent = 'Слайд ' + (i + 1) + ' из ' + total;
+  renderMathSoon();
+}
+
+function changeSlide(dir){
+  current = Math.min(Math.max(current + dir, 0), total - 1);
+  showSlide(current);
+}
+
+for(var p = 0; p < pills.length; p++){
+  (function(idx){
+    pills[idx].addEventListener('click', function(){
+      current = idx;
+      showSlide(current);
+    });
+  })(p);
+}
+
+/* ============================================================
+   КАРУСЕЛЬ ВНУТРИ СЛАЙДА
+   ============================================================ */
+var carousels = {};
+
+document.querySelectorAll('[data-carousel]').forEach(function(car, idx){
+  var cards = car.querySelectorAll('.question-card');
+  var dotsEl = car.querySelector('[data-carousel-dots]');
+  var counterEl = car.querySelector('[data-carousel-counter]');
+  var prevBtnC = car.querySelectorAll('.carousel-nav button')[0];
+  var nextBtnC = car.querySelectorAll('.carousel-nav button')[1];
+
+  cards.forEach(function(_, i){
+    var dot = document.createElement('div');
+    dot.className = 'q-dot' + (i === 0 ? ' active' : '');
+    dot.onclick = function(){ goTo(car, i); };
+    dotsEl.appendChild(dot);
+  });
+
+  carousels[idx] = {
+    car: car,
+    cards: cards,
+    dotsEl: dotsEl,
+    counterEl: counterEl,
+    prevBtn: prevBtnC,
+    nextBtn: nextBtnC,
+    current: 0,
+    total: cards.length
+  };
+
+  prevBtnC.onclick = function(){ carouselPrev(idx); };
+  nextBtnC.onclick = function(){ carouselNext(idx); };
+
+  updateCarousel(idx);
+});
+
+function goTo(car, i){
+  var key = null;
+  for(var k in carousels){
+    if(carousels[k].car === car){ key = k; break; }
+  }
+  if(key === null) return;
+  var state = carousels[key];
+  state.current = Math.min(Math.max(i, 0), state.total - 1);
+
+  state.cards.forEach(function(c, idx){
+    c.classList.toggle('active', idx === state.current);
+  });
+  state.dotsEl.querySelectorAll('.q-dot').forEach(function(d, idx){
+    d.classList.toggle('active', idx === state.current);
+  });
+  state.counterEl.textContent = (state.current + 1) + ' / ' + state.total;
+  state.prevBtn.disabled = (state.current === 0);
+  state.nextBtn.disabled = (state.current === state.total - 1);
+
+  renderMathSoon();
+}
+
+function updateCarousel(idx){
+  var state = carousels[idx];
+  if(!state) return;
+  goTo(state.car, state.current);
+}
+
+function carouselPrev(idx){
+  var state = carousels[idx];
+  if(!state) return;
+  goTo(state.car, state.current - 1);
+}
+
+function carouselNext(idx){
+  var state = carousels[idx];
+  if(!state) return;
+  goTo(state.car, state.current + 1);
+}
+
+/* ============================================================
+   ВЫБОР ВАРИАНТА
+   ============================================================ */
+document.querySelectorAll('.option').forEach(function(opt){
+  opt.addEventListener('click', function(){
+    var card = opt.closest('.question-card');
+    if(card.dataset.answered === 'true') return;
+
+    var isCorrect = opt.dataset.correct === 'true';
+    if(isCorrect){
+      opt.classList.add('correct');
+      opt.querySelector('.marker').textContent = '✓';
+      card.dataset.answered = 'true';
+    } else {
+      opt.classList.add('wrong');
+      opt.querySelector('.marker').textContent = '✕';
+      setTimeout(function(){
+        opt.classList.remove('wrong');
+        opt.querySelector('.marker').textContent = '';
+      }, 800);
+    }
+  });
+});
+
+/* ============================================================
+   ОДЗ — ПРОВЕРКА
+   ============================================================ */
+function normalize(str){
+  return String(str).toLowerCase()
+    .replace(/\s+/g,'')
+    .replace(/х/g,'x')
+    .replace(/≠/g,'')
+    .replace(/x/g,'')
+    .replace(/;/g,',')
+    .replace(/и/g,',')
+    .replace(/±/g,'')
+    .replace(/\+/g,'');
+}
+
+function checkInput(inputId, correctVariants, correctText){
+  var inp = document.getElementById(inputId);
+  var res = document.getElementById(inputId + '-res');
+  var user = normalize(inp.value);
+  if(user === ''){
+    inp.classList.remove('correct','wrong');
+    res.textContent = '⚠️ Введи значение';
+    res.className = 'result-msg err';
+    return;
+  }
+  var ok = correctVariants.some(function(v){ return normalize(v) === user; });
+  if(ok){
+    inp.classList.remove('wrong');
+    inp.classList.add('correct');
+    res.textContent = '✅ Верно! ' + correctText;
+    res.className = 'result-msg ok';
+  } else {
+    inp.classList.remove('correct');
+    inp.classList.add('wrong');
+    res.textContent = '❌ Правильный ответ: ' + correctText;
+    res.className = 'result-msg err';
+  }
+}
+
+/* ============================================================
+   ПОРЯДОК ШАГОВ — МЯГКАЯ ПРОВЕРКА
+   Поддерживается несколько допустимых последовательностей.
+   ============================================================ */
+var orderState = { a: 0, b: 0, c: 0 };
+
+document.querySelectorAll('.order-steps').forEach(function(group){
+  var key = group.dataset.order;
+  group.querySelectorAll('.step-card').forEach(function(card){
+    card.addEventListener('click', function(){
+      if(card.classList.contains('picked')) return;
+      orderState[key]++;
+      card.classList.add('picked');
+      card.querySelector('.step-order').textContent = orderState[key];
+
+      var totalSteps = group.querySelectorAll('.step-card').length;
+      var pickedSteps = group.querySelectorAll('.step-card.picked').length;
+      if(pickedSteps === totalSteps){
+        // собираем последовательность отображения:
+        // для каждой позиции 1..N находим, какой шаг её занимает
+        var displaySequence = [];
+        group.querySelectorAll('.step-card').forEach(function(c){
+          var pos = parseInt(c.querySelector('.step-order').textContent);
+          var stepId = parseInt(c.dataset.step);
+          displaySequence[pos - 1] = stepId;
+        });
+
+        // список разрешённых последовательностей
+        var validList = (group.dataset.valid || '').split('|').map(function(s){
+          return s.split(',').map(function(x){ return parseInt(x); });
+        });
+
+        // проверяем, совпадает ли displaySequence с одной из разрешённых
+        var correct = validList.some(function(valid){
+          if(valid.length !== displaySequence.length) return false;
+          for(var i = 0; i < valid.length; i++){
+            if(valid[i] !== displaySequence[i]) return false;
+          }
+          return true;
+        });
+
+        setTimeout(function(){
+          if(correct){
+            group.querySelectorAll('.step-card').forEach(function(c){
+              c.style.background = 'var(--ok-light)';
+              c.style.borderColor = 'var(--ok)';
+            });
+          } else {
+            group.querySelectorAll('.step-card').forEach(function(c){
+              c.style.background = 'var(--err-light)';
+              c.style.borderColor = 'var(--err)';
+            });
+          }
+        }, 400);
+      }
+    });
+  });
+});
+
+function resetOrder(key){
+  orderState[key] = 0;
+  var group = document.querySelector('.order-steps[data-order="' + key + '"]');
+  group.querySelectorAll('.step-card').forEach(function(c){
+    c.classList.remove('picked');
+    c.querySelector('.step-order').textContent = '';
+    c.style.background = '';
+    c.style.borderColor = '';
+  });
+}
+
+/* ============================================================
+   СОБЕРИ РЕШЕНИЕ — С БУКВАМИ
+   ============================================================ */
+var BUILD_PIECES = [
+  { id: 'A', letter: 'А', text: '$= \\dfrac{a \\cdot a}{ab} - \\dfrac{b \\cdot b}{ab}$', order: 1 },
+  { id: 'B', letter: 'Б', text: '$= \\dfrac{a^2}{ab} - \\dfrac{b^2}{ab}$', order: 2 },
+  { id: 'C', letter: 'В', text: '$= \\dfrac{a^2 - b^2}{ab}$', order: 3 },
+  { id: 'D', letter: 'Г', text: '$= \\dfrac{(a-b)(a+b)}{ab}$', order: 4 }
+];
+
+var buildSlots = [];
+
+function initBuild(){
+  var shuffledPieces = BUILD_PIECES.slice().sort(function(){ return Math.random() - 0.5; });
+
+  var slotsEl = document.getElementById('buildSlots');
+  if(!slotsEl) return;
+  slotsEl.innerHTML = '';
+  buildSlots = [];
+  BUILD_PIECES.forEach(function(_, i){
+    var slot = document.createElement('div');
+    slot.className = 'build-slot';
+    slot.dataset.slotIndex = i;
+    slot.innerHTML = '<span class="slot-num">' + (i + 1) + '</span><span class="slot-content"></span>';
+    slotsEl.appendChild(slot);
+    buildSlots.push({ index: i, piece: null });
+  });
+
+  var poolEl = document.getElementById('piecesPool');
+  poolEl.innerHTML = '';
+  shuffledPieces.forEach(function(p){
+    var piece = document.createElement('div');
+    piece.className = 'piece';
+    piece.dataset.pieceId = p.id;
+    piece.innerHTML = '<span class="piece-letter">' + p.letter + '</span>' + p.text;
+    piece.addEventListener('click', function(){ pickPiece(p.id); });
+    poolEl.appendChild(piece);
+  });
+
+  var res = document.getElementById('buildResult');
+  if(res) res.classList.remove('show');
+  renderMathSoon();
+}
+
+function pickPiece(pieceId){
+  var freeSlot = null;
+  for(var i = 0; i < buildSlots.length; i++){
+    if(buildSlots[i].piece === null){ freeSlot = buildSlots[i]; break; }
+  }
+  if(!freeSlot) return;
+
+  var piece = null;
+  for(var j = 0; j < BUILD_PIECES.length; j++){
+    if(BUILD_PIECES[j].id === pieceId){ piece = BUILD_PIECES[j]; break; }
+  }
+  freeSlot.piece = piece;
+
+  var slotEl = document.querySelector('.build-slot[data-slot-index="' + freeSlot.index + '"]');
+  slotEl.classList.add('filled');
+  slotEl.querySelector('.slot-content').innerHTML =
+    '<span class="slot-letter">' + piece.letter + '</span>' + piece.text;
+
+  var removeBtn = document.createElement('button');
+  removeBtn.className = 'remove-btn';
+  removeBtn.textContent = '✕';
+  removeBtn.onclick = function(e){
+    e.stopPropagation();
+    removePieceFromSlot(freeSlot.index);
+  };
+  slotEl.appendChild(removeBtn);
+
+  var pieceEl = document.querySelector('.piece[data-piece-id="' + pieceId + '"]');
+  pieceEl.classList.add('used');
+
+  renderMathSoon();
+}
+
+function removePieceFromSlot(slotIndex){
+  var slot = buildSlots[slotIndex];
+  if(!slot.piece) return;
+
+  var pieceId = slot.piece.id;
+  slot.piece = null;
+
+  var slotEl = document.querySelector('.build-slot[data-slot-index="' + slotIndex + '"]');
+  slotEl.classList.remove('filled');
+  slotEl.querySelector('.slot-content').innerHTML = '';
+  var removeBtn = slotEl.querySelector('.remove-btn');
+  if(removeBtn) removeBtn.remove();
+
+  var pieceEl = document.querySelector('.piece[data-piece-id="' + pieceId + '"]');
+  pieceEl.classList.remove('used');
+}
+
+function checkBuild(){
+  var allFilled = buildSlots.every(function(s){ return s.piece !== null; });
+  var res = document.getElementById('buildResult');
+
+  if(!allFilled){
+    res.className = 'build-result show err';
+    res.textContent = '⚠️ Заполни все шаги.';
+    return;
+  }
+
+  var correct = true;
+  buildSlots.forEach(function(s, i){
+    if(s.piece.order !== i + 1) correct = false;
+  });
+
+  if(correct){
+    res.className = 'build-result show ok';
+    res.textContent = '🎉 Верно! Ответ: $\\dfrac{(a-b)(a+b)}{ab}$.';
+  } else {
+    res.className = 'build-result show err';
+    res.textContent = '❌ Порядок неверный. Вспомни: общий знаменатель → вычитание → разложение на множители.';
+  }
+  renderMathSoon();
+}
+
+function resetBuild(){
+  initBuild();
+}
+
+/* ============================================================
+   ИНИЦИАЛИЗАЦИЯ
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', function(){
+  showSlide(0);
+  initBuild();
+
+  if(window.MathJax && MathJax.startup && MathJax.startup.promise){
+    MathJax.startup.promise.then(function(){
+      renderMathSoon();
+    });
+  }
+
+  var attempts = 0;
+  var check = setInterval(function(){
+    attempts++;
+    if(window.MathJax && MathJax.typesetPromise){
+      clearInterval(check);
+      renderMathSoon();
+    }
+    if(attempts > 60) clearInterval(check);
+  }, 100);
+});
+</script>
+
+</body>
+</html>
