@@ -4,7 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Проверочная работа · Преобразование рациональных выражений</title>
-
+<script>
+(function(){
+  // подменяем историю, чтобы «Назад» не уводил с проверочной
+  history.pushState(null, '', location.href);
+  window.addEventListener('popstate', function(){
+    history.pushState(null, '', location.href);
+  });
+})();
+</script>
 <!-- Защита от копирования -->
 <script>
 (function(){
