@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Рабочие тетради · Онлайн-уроки</title>
+<script>
+MathJax = {
+  tex: {inlineMath: [['$','$'],['\\(','\\)']]},
+  svg: {fontCache: 'global'}
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root{
+    --orange:#ea580c;
+    --orange-dark:#c2410c;
+    --orange-light:#ffedd5;
+    --orange-soft:#fed7aa;
+    --amber:#f59e0b;
+    --amber-dark:#d97706;
+    --amber-light:#fef3c7;
+    --ok:#10b981;
+    --text:#1e293b;
+    --muted:#78716c;
+    --border:#fed7aa;
+    --bg:#fffbf5;
+  }
+  *{box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif;}
+  html,body{margin:0;padding:0;min-height:100vh;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 5% -5%, #ffedd5 0%, transparent 55%),
+      radial-gradient(900px 500px at 100% 100%, #fef3c7 0%, transparent 55%),
+      #fffbf5;
+    color:var(--text);
+    display:flex;flex-direction:column;
+    min-height:100vh;
+    position:relative;
+    overflow-x:hidden;
+  }
+
+  /* Декоративные листочки */
+  .bg-leaf{
+    position:fixed;
+    pointer-events:none;
+    z-index:0;
+    user-select:none;
+  }
+  .bg-leaf.l1{top:6%;left:3%;transform:rotate(-25deg);font-size:100px;opacity:.16;}
+  .bg-leaf.l2{top:35%;right:4%;transform:rotate(35deg);font-size:140px;opacity:.12;}
+  .bg-leaf.l3{bottom:10%;left:10%;transform:rotate(15deg);font-size:110px;opacity:.14;}
+  .bg-leaf.l4{bottom:5%;right:15%;transform:rotate(-45deg);font-size:80px;opacity:.15;}
+  .bg-leaf.l5{top:15%;right:35%;transform:rotate(-10deg);font-size:70px;opacity:.13;}
+  .bg-leaf.l6{bottom:40%;left:40%;transform:rotate(120deg);font-size:85px;opacity:.1;}
+  .bg-leaf.l7{top:70%;left:2%;transform:rotate(60deg);font-size:75px;opacity:.12;}
+  .bg-leaf.l8{top:5%;right:8%;transform:rotate(-60deg);font-size:95px;opacity:.14;}
+
+  /* HEADER */
+  header{
+    padding:20px 40px;
+    display:flex;justify-content:space-between;align-items:center;
+    position:relative;z-index:10;
+    flex-wrap:wrap;gap:14px;
+  }
+  .brand{
+    display:flex;align-items:center;gap:14px;
+  }
+  .brand-icon{
+    width:54px;height:54px;border-radius:16px;
+    background:linear-gradient(135deg,var(--orange),var(--amber));
+    display:flex;align-items:center;justify-content:center;
+    font-size:28px;
+    box-shadow:0 8px 24px rgba(234,88,12,.3);
+  }
+  .brand-text h1{
+    margin:0;font-size:19px;font-weight:800;
+    color:var(--orange-dark);letter-spacing:-.2px;
+  }
+  .brand-text p{
+    margin:2px 0 0;font-size:13px;color:var(--muted);
+  }
+
+  /* MAIN */
+  main{
+    flex:1;
+    max-width:1100px;
+    width:100%;
+    margin:0 auto;
+    padding:20px 40px 60px;
+    position:relative;z-index:5;
+  }
+
+  .page-intro{
+    text-align:center;
+    margin-bottom:44px;
+  }
+  .page-intro h2{
+    font-size:36px;
+    margin:0 0 10px;
+    color:var(--orange-dark);
+    font-weight:800;
+    letter-spacing:-.5px;
+  }
+  .page-intro p{
+    font-size:16px;
+    color:var(--muted);
+    margin:0;
+    max-width:600px;
+    margin:0 auto;
+  }
+
+  /* СЕКЦИЯ УРОКОВ */
+  .section-title{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:20px;
+  }
+  .section-title h3{
+    font-size:14px;
+    text-transform:uppercase;
+    letter-spacing:.8px;
+    color:var(--amber-dark);
+    font-weight:800;
+    margin:0;
+  }
+  .section-title .line{
+    flex:1;height:1px;
+    background:linear-gradient(90deg, var(--border), transparent);
+  }
+
+  /* КАРТОЧКА УРОКА */
+  .lessons-list{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+    margin-bottom:40px;
+  }
+
+  .lesson-card{
+    background:#fffdf9;
+    border:2px solid var(--border);
+    border-radius:20px;
+    overflow:hidden;
+    transition:.3s;
+    box-shadow:0 4px 20px rgba(234,88,12,.06);
+  }
+  .lesson-card:hover{
+    border-color:var(--orange);
+    box-shadow:0 10px 34px rgba(234,88,12,.14);
+  }
+  .lesson-card.open{
+    border-color:var(--orange);
+    box-shadow:0 14px 40px rgba(234,88,12,.18);
+  }
+
+  /* Шапка карточки (клик — раскрыть) */
+  .lesson-header{
+    padding:22px 28px;
+    display:flex;
+    align-items:center;
+    gap:18px;
+    cursor:pointer;
+    user-select:none;
+    position:relative;
+    background:linear-gradient(135deg,#fffdf9,#fff7ed);
+    transition:.25s;
+  }
+  .lesson-header:hover{background:linear-gradient(135deg,#fff7ed,#ffedd5);}
+  .lesson-card.open .lesson-header{
+    background:linear-gradient(135deg,#ffedd5,#fed7aa);
+  }
+
+  .lesson-num{
+    width:54px;height:54px;border-radius:16px;
+    background:linear-gradient(135deg,var(--orange),var(--amber));
+    color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px;font-weight:800;
+    flex-shrink:0;
+    box-shadow:0 6px 18px rgba(234,88,12,.3);
+  }
+
+  .lesson-info{
+    flex:1;
+  }
+  .lesson-info h4{
+    margin:0 0 4px;
+    font-size:20px;
+    font-weight:800;
+    color:var(--text);
+  }
+  .lesson-info p{
+    margin:0;
+    font-size:14px;
+    color:var(--muted);
+  }
+
+  .lesson-toggle{
+    width:38px;height:38px;border-radius:50%;
+    background:#fff;
+    border:2px solid var(--border);
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;
+    color:var(--orange);
+    font-weight:800;
+    transition:.3s;
+    flex-shrink:0;
+  }
+  .lesson-card.open .lesson-toggle{
+    background:linear-gradient(135deg,var(--orange),var(--amber));
+    color:#fff;
+    border-color:transparent;
+    transform:rotate(180deg);
+  }
+
+  /* Выпадающий список частей урока */
+  .lesson-parts{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .4s ease;
+    background:#fff;
+  }
+  .lesson-card.open .lesson-parts{
+    max-height:600px;
+  }
+  .lesson-parts-inner{
+    padding:20px 28px 26px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:14px;
+  }
+
+  /* Кнопка-часть урока */
+  .part-link{
+    text-decoration:none;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:16px 18px;
+    background:#fffdf9;
+    border:2px solid var(--border);
+    border-radius:14px;
+    transition:.25s;
+    color:var(--text);
+    position:relative;
+    overflow:hidden;
+  }
+  .part-link::before{
+    content:'';
+    position:absolute;
+    left:0;top:0;bottom:0;
+    width:5px;
+    background:linear-gradient(180deg,var(--orange),var(--amber));
+    transform:scaleY(0);
+    transition:.3s;
+    transform-origin:center;
+  }
+  .part-link:hover{
+    border-color:var(--orange);
+    background:linear-gradient(135deg,#fff7ed,#ffedd5);
+    transform:translateY(-2px);
+    box-shadow:0 8px 22px rgba(234,88,12,.15);
+  }
+  .part-link:hover::before{
+    transform:scaleY(1);
+  }
+
+  .part-icon{
+    width:44px;height:44px;border-radius:12px;
+    background:linear-gradient(135deg,#ffedd5,#fed7aa);
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px;
+    flex-shrink:0;
+    transition:.3s;
+  }
+  .part-link:hover .part-icon{
+    background:linear-gradient(135deg,var(--orange),var(--amber));
+    transform:scale(1.08) rotate(-6deg);
+  }
+
+  .part-info h5{
+    margin:0 0 3px;
+    font-size:15px;
+    font-weight:800;
+    color:var(--text);
+  }
+  .part-info p{
+    margin:0;
+    font-size:12px;
+    color:var(--muted);
+    line-height:1.4;
+  }
+
+  /* Пустое состояние */
+  .empty-state{
+    text-align:center;
+    padding:60px 20px;
+    background:linear-gradient(135deg,#fffdf9,#fff7ed);
+    border:2px dashed var(--border);
+    border-radius:20px;
+    color:var(--muted);
+  }
+  .empty-state .emoji{
+    font-size:48px;
+    display:block;
+    margin-bottom:12px;
+    opacity:.5;
+  }
+
+  /* FOOTER */
+  footer{
+    text-align:center;
+    padding:20px 40px;
+    font-size:13px;
+    color:var(--muted);
+    position:relative;z-index:5;
+  }
+  footer .heart{color:var(--orange);}
+</style>
+</head>
+<body>
+
+<span class="bg-leaf l1">🌿</span>
+<span class="bg-leaf l2">🍃</span>
+<span class="bg-leaf l3">🌱</span>
+<span class="bg-leaf l4">🌿</span>
+<span class="bg-leaf l5">🍃</span>
+<span class="bg-leaf l6">🌱</span>
+<span class="bg-leaf l7">🌿</span>
+<span class="bg-leaf l8">🍃</span>
+
+<header>
+  <div class="brand">
+    <div class="brand-icon">🧮</div>
+    <div class="brand-text">
+      <h1>Рабочие тетради · Алгебра</h1>
+      <p>Интерактивные материалы к урокам</p>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="page-intro">
+    <h2>Выберите урок</h2>
+    <p>Нажмите на урок, чтобы увидеть его части: актуализация, основной урок и проверка.</p>
+  </div>
+
+  <div class="section-title">
+    <h3>8 класс · Алгебра</h3>
+    <div class="line"></div>
+  </div>
+
+  <div class="lessons-list">
+
+    <!-- ======================================================
+         УРОК 1. Преобразование рациональных выражений
+         ====================================================== -->
+    <div class="lesson-card" data-lesson="1">
+      <div class="lesson-header" onclick="toggleLesson(this)">
+        <div class="lesson-num">1</div>
+        <div class="lesson-info">
+          <h4>Преобразование дробно-рациональных выражений</h4>
+          <p>Урок 2 · Закрепление · 3 части</p>
+        </div>
+        <div class="lesson-toggle">▾</div>
+      </div>
+      <div class="lesson-parts">
+        <div class="lesson-parts-inner">
+
+          <a class="part-link" href="aktualizaciya.html">
+            <div class="part-icon">💡</div>
+            <div class="part-info">
+              <h5>Актуализация</h5>
+              <p>Формулы, пары, ОДЗ, общие множители</p>
+            </div>
+          </a>
+
+          <a class="part-link" href="osnovnoy-urok.html">
+            <div class="part-icon">📝</div>
+            <div class="part-info">
+              <h5>Основной урок</h5>
+              <p>4 задания по 6 примеров с полем для решения</p>
+            </div>
+          </a>
+
+          <a class="part-link" href="zakreplenie.html">
+            <div class="part-icon">🎯</div>
+            <div class="part-info">
+              <h5>Проверь себя</h5>
+              <p>Координаты точек и графики функций</p>
+            </div>
+          </a>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================
+         ШАБЛОН ДЛЯ СЛЕДУЮЩЕГО УРОКА
+         Раскомментируйте и поменяйте содержимое,
+         когда будете готовить новый урок.
+         ====================================================== -->
+    <!--
+    <div class="lesson-card" data-lesson="2">
+      <div class="lesson-header" onclick="toggleLesson(this)">
+        <div class="lesson-num">2</div>
+        <div class="lesson-info">
+          <h4>Название следующего урока</h4>
+          <p>Урок 1 · Изучение нового · 3 части</p>
+        </div>
+        <div class="lesson-toggle">▾</div>
+      </div>
+      <div class="lesson-parts">
+        <div class="lesson-parts-inner">
+          <a class="part-link" href="urok2-aktualizaciya.html">
+            <div class="part-icon">💡</div>
+            <div class="part-info">
+              <h5>Актуализация</h5>
+              <p>Описание</p>
+            </div>
+          </a>
+          <a class="part-link" href="urok2-osnovnoy.html">
+            <div class="part-icon">📝</div>
+            <div class="part-info">
+              <h5>Основной урок</h5>
+              <p>Описание</p>
+            </div>
+          </a>
+          <a class="part-link" href="urok2-zakreplenie.html">
+            <div class="part-icon">🎯</div>
+            <div class="part-info">
+              <h5>Проверь себя</h5>
+              <p>Описание</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+    -->
+
+  </div>
+
+</main>
+
+<footer>
+  Сделано с <span class="heart">♥</span> для уроков алгебры
+</footer>
+
+<script>
+/* ============================================================
+   РАСКРЫТИЕ / СКРЫТИЕ КАРТОЧКИ УРОКА
+   ============================================================ */
+function toggleLesson(header){
+  const card = header.closest('.lesson-card');
+  const wasOpen = card.classList.contains('open');
+
+  // закрыть все остальные
+  document.querySelectorAll('.lesson-card.open').forEach(c => {
+    if(c !== card) c.classList.remove('open');
+  });
+
+  // переключить текущую
+  card.classList.toggle('open', !wasOpen);
+}
+
+/* ============================================================
+   АВТОРАСКРЫТИЕ ПЕРВОГО УРОКА ПРИ ЗАГРУЗКЕ
+   ============================================================ */
+window.addEventListener('load', () => {
+  const first = document.querySelector('.lesson-card');
+  if(first) {
+    setTimeout(() => first.classList.add('open'), 300);
+  }
+});
+</script>
+
+</body>
+</html>
