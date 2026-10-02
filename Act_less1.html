@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Актуализация · Преобразование рациональных выражений</title>
+<script>
+MathJax = {
+  tex: {inlineMath: [['$','$'],['\\(','\\)']]},
+  svg: {fontCache: 'global'}
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root{
+    --primary:#4f46e5;
+    --primary-dark:#4338ca;
+    --primary-light:#eef2ff;
+    --accent:#f59e0b;
+    --accent-dark:#d97706;
+    --accent-light:#fef3c7;
+    --ok:#10b981;
+    --ok-light:#d1fae5;
+    --err:#ef4444;
+    --err-light:#fee2e2;
+    --bg:#f8fafc;
+    --card:#fff;
+    --text:#1e293b;
+    --muted:#64748b;
+    --border:#e2e8f0;
+  }
+  *{box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    background:linear-gradient(135deg,#eef2ff 0%,#fef3c7 100%);
+    min-height:100vh;color:var(--text);
+    display:flex;flex-direction:column;
+  }
+
+  /* ============ HEADER ============ */
+  header{
+    padding:14px 28px;
+    display:flex;justify-content:space-between;align-items:center;
+    background:rgba(255,255,255,.7);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .header-title{
+    font-size:15px;font-weight:800;
+    color:var(--primary-dark);
+    letter-spacing:.3px;
+  }
+  .header-title span{
+    color:var(--muted);font-weight:600;margin-left:8px;
+  }
+  .progress-pills{
+    display:flex;gap:8px;align-items:center;
+  }
+  .progress-pill{
+    width:34px;height:34px;border-radius:50%;
+    background:#fff;border:2px solid var(--border);
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:800;color:var(--muted);
+    transition:.3s;cursor:pointer;
+  }
+  .progress-pill:hover{border-color:var(--primary);color:var(--primary);}
+  .progress-pill.active{
+    background:linear-gradient(135deg,var(--primary),#8b5cf6);
+    color:#fff;border-color:transparent;
+    transform:scale(1.1);
+    box-shadow:0 4px 14px rgba(79,70,229,.35);
+  }
+  .progress-pill.done{
+    background:var(--ok-light);color:var(--ok);
+    border-color:var(--ok);
+  }
+
+  /* ============ MAIN ============ */
+  main{
+    flex:1;padding:28px 20px 120px;
+    display:flex;justify-content:center;
+  }
+  .slide{
+    display:none;
+    background:var(--card);border-radius:22px;
+    padding:36px 44px;
+    box-shadow:0 14px 50px rgba(15,23,42,.1);
+    border:1px solid var(--border);
+    width:100%;max-width:1080px;
+    animation:fade .4s ease;
+  }
+  .slide.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
+
+  .slide-tag{
+    display:inline-block;
+    background:var(--accent-light);color:var(--accent-dark);
+    padding:5px 14px;border-radius:20px;
+    font-size:13px;font-weight:700;margin-bottom:14px;
+    border:1px solid rgba(245,158,11,.25);
+  }
+  .slide h2{
+    font-size:28px;margin:0 0 6px;color:var(--text);font-weight:800;
+    letter-spacing:-.3px;
+  }
+  .slide .subtitle{
+    color:var(--muted);font-size:16px;margin:0 0 26px;
+  }
+
+  /* ============ ФЛИП-КАРТЫ ============ */
+  .flip-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:18px;
+  }
+  .flip-card{perspective:1200px;height:140px;cursor:pointer;}
+  .flip-inner{
+    position:relative;width:100%;height:100%;
+    transition:transform .7s cubic-bezier(.4,.2,.2,1);
+    transform-style:preserve-3d;
+  }
+  .flip-card.flipped .flip-inner{transform:rotateY(180deg);}
+  .flip-front,.flip-back{
+    position:absolute;width:100%;height:100%;
+    backface-visibility:hidden;border-radius:16px;
+    display:flex;align-items:center;justify-content:center;
+    padding:18px;text-align:center;font-size:19px;
+    box-shadow:0 8px 24px rgba(15,23,42,.12);
+  }
+  .flip-front{
+    background:linear-gradient(135deg,var(--primary),#8b5cf6);
+    color:#fff;font-weight:700;
+  }
+  .flip-front .hint-icon{
+    position:absolute;top:10px;right:14px;
+    font-size:15px;opacity:.7;
+  }
+  .flip-back{
+    background:linear-gradient(135deg,#ecfdf5,#d1fae5);
+    color:#065f46;font-weight:700;
+    transform:rotateY(180deg);
+    border:2px solid var(--ok);
+  }
+
+  /* ============ ИГРА «НАЙДИ ПАРУ» ============ */
+  .match-board{
+    display:grid;grid-template-columns:1fr 1fr;
+    gap:36px;margin-top:8px;
+  }
+  @media (max-width:700px){.match-board{grid-template-columns:1fr;}}
+  .match-col h3{
+    font-size:15px;text-transform:uppercase;letter-spacing:.5px;
+    color:var(--muted);font-weight:800;margin:0 0 14px;
+    text-align:center;
+  }
+  .match-item{
+    background:var(--primary-light);
+    border:2px solid transparent;border-radius:12px;
+    padding:16px 20px;margin-bottom:12px;
+    font-size:18px;cursor:pointer;transition:.2s;
+    text-align:center;font-weight:600;user-select:none;
+  }
+  .match-item:hover{
+    border-color:var(--primary);transform:translateY(-2px);
+    box-shadow:0 6px 18px rgba(79,70,229,.15);
+  }
+  .match-item.selected{
+    background:linear-gradient(135deg,var(--primary),#8b5cf6);
+    color:#fff;transform:scale(1.03);
+  }
+  .match-item.matched{
+    background:linear-gradient(135deg,#d1fae5,#a7f3d0);
+    color:#065f46;border-color:var(--ok);
+    cursor:default;opacity:.75;
+  }
+  .match-item.matched::after{content:' ✓';font-weight:800;}
+  .match-item.wrong{
+    animation:shake .4s;background:#fee2e2;border-color:var(--err);
+  }
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-8px);}
+    75%{transform:translateX(8px);}
+  }
+  .match-status{
+    text-align:center;margin-top:22px;
+    font-size:17px;font-weight:700;color:var(--muted);
+  }
+  .match-status.done{color:var(--ok);font-size:19px;}
+
+  /* ============ ОДЗ ============ */
+  .odz-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    gap:20px;margin-top:8px;
+  }
+  .odz-card{
+    background:linear-gradient(180deg,#fafbff,#fff);
+    border:2px solid var(--border);border-radius:16px;
+    padding:20px 22px;transition:.2s;
+  }
+  .odz-card:hover{border-color:var(--primary);box-shadow:0 8px 24px rgba(79,70,229,.1);}
+  .odz-card .odz-num{
+    display:inline-block;background:var(--primary);color:#fff;
+    padding:3px 12px;border-radius:10px;
+    font-size:12px;font-weight:800;margin-bottom:12px;
+  }
+  .odz-card .odz-expr{
+    font-size:22px;font-weight:600;margin:8px 0 16px;
+    line-height:1.7;
+  }
+  .odz-options{
+    display:flex;flex-direction:column;gap:8px;
+  }
+  .odz-option{
+    background:#fff;border:2px solid var(--border);
+    border-radius:10px;padding:12px 16px;
+    font-size:16px;cursor:pointer;transition:.2s;
+    display:flex;align-items:center;gap:12px;
+    font-weight:500;
+  }
+  .odz-option:hover{border-color:var(--primary);background:var(--primary-light);}
+  .odz-option.correct{
+    background:var(--ok-light);border-color:var(--ok);
+    color:#065f46;font-weight:700;
+  }
+  .odz-option.wrong{
+    background:var(--err-light);border-color:var(--err);
+    color:#991b1b;animation:shake .4s;
+  }
+  .odz-option .marker{
+    width:24px;height:24px;border-radius:50%;
+    border:2px solid var(--border);
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:800;flex-shrink:0;
+    transition:.2s;
+  }
+  .odz-option.correct .marker{
+    background:var(--ok);border-color:var(--ok);color:#fff;
+  }
+  .odz-option.wrong .marker{
+    background:var(--err);border-color:var(--err);color:#fff;
+  }
+
+  /* ============ ОБЩИЕ МНОЖИТЕЛИ ============ */
+  .common-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:24px;
+    margin-top:8px;
+  }
+  @media (max-width:750px){.common-grid{grid-template-columns:1fr;}}
+  .common-task{
+    background:linear-gradient(180deg,#fafbff,#fff);
+    border:2px solid var(--border);border-radius:16px;
+    padding:22px 24px;
+  }
+  .common-task .common-num{
+    display:inline-block;background:var(--accent);color:#fff;
+    padding:3px 12px;border-radius:10px;
+    font-size:12px;font-weight:800;margin-bottom:14px;
+  }
+  .common-task h4{
+    margin:0 0 14px;font-size:14px;color:var(--muted);
+    font-weight:700;text-transform:uppercase;letter-spacing:.4px;
+  }
+  .common-task .pair{
+    display:flex;flex-direction:column;gap:12px;
+    margin-bottom:16px;
+  }
+  .common-task .pair .expr{
+    background:#fff;border:2px solid var(--primary-light);
+    border-radius:10px;padding:14px 18px;
+    font-size:20px;font-weight:600;
+    text-align:center;
+  }
+  .common-task .find-label{
+    font-size:14px;color:var(--accent-dark);
+    font-weight:800;text-transform:uppercase;
+    letter-spacing:.4px;margin-bottom:8px;
+  }
+  .common-task .answer-field{
+    background:#fffbeb;
+    border:2px dashed var(--accent);
+    border-radius:10px;padding:14px 18px;
+    font-size:16px;min-height:70px;
+    color:var(--muted);font-style:italic;
+  }
+  .common-task .reveal-btn{
+    background:var(--primary);color:#fff;border:none;
+    padding:9px 20px;border-radius:8px;cursor:pointer;
+    font-size:14px;font-weight:700;margin-top:12px;
+    transition:.2s;
+  }
+  .common-task .reveal-btn:hover{background:var(--primary-dark);}
+  .common-task .answer-revealed{
+    display:none;margin-top:12px;
+    background:var(--ok-light);border-left:4px solid var(--ok);
+    border-radius:8px;padding:14px 18px;
+    font-size:16px;color:#065f46;font-weight:600;
+  }
+  .common-task .answer-revealed.show{display:block;animation:fadeIn .3s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:none;}}
+
+  /* ============ ПРАВИЛО ============ */
+  .rule-strip{
+    background:var(--primary-light);
+    border-left:5px solid var(--primary);
+    border-radius:10px;
+    padding:14px 20px;margin-top:22px;
+    font-size:15px;
+  }
+  .rule-strip b{color:var(--primary-dark);}
+
+  /* ============ NAVIGATION ============ */
+  nav{
+    position:fixed;bottom:0;left:0;right:0;
+    padding:16px 28px;
+    background:rgba(255,255,255,.85);
+    backdrop-filter:blur(10px);
+    border-top:1px solid var(--border);
+    display:flex;justify-content:space-between;align-items:center;gap:14px;
+    z-index:100;
+  }
+  nav button{
+    padding:13px 28px;border:none;border-radius:12px;
+    font-size:15px;font-weight:700;cursor:pointer;
+    transition:.2s;
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  nav .nav-prev{
+    background:#fff;color:var(--primary);
+    border:2px solid var(--primary);
+  }
+  nav .nav-prev:hover:not(:disabled){background:var(--primary-light);}
+  nav .nav-next{
+    background:linear-gradient(135deg,var(--primary),#8b5cf6);
+    color:#fff;
+    box-shadow:0 4px 14px rgba(79,70,229,.35);
+  }
+  nav .nav-next:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 20px rgba(79,70,229,.45);}
+  nav button:disabled{opacity:.4;cursor:not-allowed;transform:none !important;box-shadow:none !important;}
+  nav .nav-info{
+    font-size:14px;font-weight:700;color:var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-title">Актуализация <span>· Преобразование рациональных выражений</span></div>
+  <div class="progress-pills">
+    <div class="progress-pill active" data-slide="0">1</div>
+    <div class="progress-pill" data-slide="1">2</div>
+    <div class="progress-pill" data-slide="2">3</div>
+    <div class="progress-pill" data-slide="3">4</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- =========================================================
+       СЛАЙД 1. ФЛИП-КАРТЫ
+       ========================================================= -->
+  <section class="slide active">
+    <span class="slide-tag">Задание 1 · 2 мин</span>
+    <h2>Вспомни формулу</h2>
+    <p class="subtitle">Нажми на карточку — проверь себя. Проговори формулу вслух.</p>
+
+    <div class="flip-grid">
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front">$a^2 - b^2$<span class="hint-icon">👆</span></div>
+          <div class="flip-back">$(a-b)(a+b)$</div>
+        </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front">$a^3 - b^3$<span class="hint-icon">👆</span></div>
+          <div class="flip-back">$(a-b)(a^2+ab+b^2)$</div>
+        </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front">$a^3 + b^3$<span class="hint-icon">👆</span></div>
+          <div class="flip-back">$(a+b)(a^2-ab+b^2)$</div>
+        </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front">$a^2 + 2ab + b^2$<span class="hint-icon">👆</span></div>
+          <div class="flip-back">$(a+b)^2$</div>
+        </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front">$a^2 - 2ab + b^2$<span class="hint-icon">👆</span></div>
+          <div class="flip-back">$(a-b)^2$</div>
+        </div>
+      </div>
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-inner">
+          <div class="flip-front">$\left(\dfrac{A}{B}\right)^n$<span class="hint-icon">👆</span></div>
+          <div class="flip-back">$\dfrac{A^n}{B^n}$</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       СЛАЙД 2. НАЙДИ ПАРУ
+       ========================================================= -->
+  <section class="slide">
+    <span class="slide-tag">Задание 2 · 2 мин</span>
+    <h2>Найди пару: выражение → разложение</h2>
+    <p class="subtitle">Нажми на выражение слева, потом на подходящее справа. Правильные пары подсветятся зелёным.</p>
+
+    <div class="match-board">
+      <div class="match-col">
+        <h3>Выражение</h3>
+        <div class="match-item" data-pair="1">$x^2 - 9$</div>
+        <div class="match-item" data-pair="2">$x^3 + 8$</div>
+        <div class="match-item" data-pair="3">$x^2 + 6x + 9$</div>
+        <div class="match-item" data-pair="4">$x^3 - 27$</div>
+        <div class="match-item" data-pair="5">$4x^2 - 1$</div>
+      </div>
+      <div class="match-col">
+        <h3>Разложение</h3>
+        <div class="match-item" data-pair="3">$(x+3)^2$</div>
+        <div class="match-item" data-pair="1">$(x-3)(x+3)$</div>
+        <div class="match-item" data-pair="5">$(2x-1)(2x+1)$</div>
+        <div class="match-item" data-pair="2">$(x+2)(x^2-2x+4)$</div>
+        <div class="match-item" data-pair="4">$(x-3)(x^2+3x+9)$</div>
+      </div>
+    </div>
+    <div class="match-status" id="match-status">Соединено пар: 0 / 5</div>
+  </section>
+
+  <!-- =========================================================
+       СЛАЙД 3. ОДЗ
+       ========================================================= -->
+  <section class="slide">
+    <span class="slide-tag">Задание 3 · 3 мин</span>
+    <h2>Найди ОДЗ дробного выражения</h2>
+    <p class="subtitle">Выбери верное условие: при каких значениях переменной знаменатель не обращается в нуль.</p>
+
+    <div class="odz-grid">
+
+      <div class="odz-card">
+        <span class="odz-num">1</span>
+        <div class="odz-expr">$\dfrac{3x+1}{x-5}$</div>
+        <div class="odz-options">
+          <div class="odz-option" data-correct="false">
+            <span class="marker">А</span>
+            <span>$x \neq -5$</span>
+          </div>
+          <div class="odz-option" data-correct="true">
+            <span class="marker">Б</span>
+            <span>$x \neq 5$</span>
+          </div>
+          <div class="odz-option" data-correct="false">
+            <span class="marker">В</span>
+            <span>$x \neq 0$</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="odz-card">
+        <span class="odz-num">2</span>
+        <div class="odz-expr">$\dfrac{a+2}{a^2-9}$</div>
+        <div class="odz-options">
+          <div class="odz-option" data-correct="false">
+            <span class="marker">А</span>
+            <span>$a \neq 3$</span>
+          </div>
+          <div class="odz-option" data-correct="false">
+            <span class="marker">Б</span>
+            <span>$a \neq -3$</span>
+          </div>
+          <div class="odz-option" data-correct="true">
+            <span class="marker">В</span>
+            <span>$a \neq -3,\ a \neq 3$</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="odz-card">
+        <span class="odz-num">3</span>
+        <div class="odz-expr">$\dfrac{5}{b^2+4}$</div>
+        <div class="odz-options">
+          <div class="odz-option" data-correct="false">
+            <span class="marker">А</span>
+            <span>$b \neq 2$</span>
+          </div>
+          <div class="odz-option" data-correct="false">
+            <span class="marker">Б</span>
+            <span>$b \neq -2,\ b \neq 2$</span>
+          </div>
+          <div class="odz-option" data-correct="true">
+            <span class="marker">В</span>
+            <span>ОДЗ: любое число</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="odz-card">
+        <span class="odz-num">4</span>
+        <div class="odz-expr">$\dfrac{m}{m^2 - m}$</div>
+        <div class="odz-options">
+          <div class="odz-option" data-correct="false">
+            <span class="marker">А</span>
+            <span>$m \neq 0$</span>
+          </div>
+          <div class="odz-option" data-correct="true">
+            <span class="marker">Б</span>
+            <span>$m \neq 0,\ m \neq 1$</span>
+          </div>
+          <div class="odz-option" data-correct="false">
+            <span class="marker">В</span>
+            <span>$m \neq 1$</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="rule-strip">
+      <b>Помни:</b> знаменатель дроби не может быть равен нулю. Разложи знаменатель на множители — и найди все значения, при которых он обращается в нуль.
+    </div>
+  </section>
+
+  <!-- =========================================================
+       СЛАЙД 4. ОБЩИЕ МНОЖИТЕЛИ
+       ========================================================= -->
+  <section class="slide">
+    <span class="slide-tag">Задание 4 · 3 мин</span>
+    <h2>Найди общие множители</h2>
+    <p class="subtitle">Для каждой пары выражений определи, что можно вынести за скобку или сократить.</p>
+
+    <div class="common-grid">
+
+      <div class="common-task">
+        <span class="common-num">Пара 1</span>
+        <h4>Даны два выражения:</h4>
+        <div class="pair">
+          <div class="expr">$6a^2b$</div>
+          <div class="expr">$9ab^2$</div>
+        </div>
+        <div class="find-label">✏️ Найди общий множитель:</div>
+        <div class="answer-field">Впиши сюда...</div>
+        <button class="reveal-btn" onclick="revealCommon(this)">Показать ответ</button>
+        <div class="answer-revealed">Общий множитель: $3ab$</div>
+      </div>
+
+      <div class="common-task">
+        <span class="common-num">Пара 2</span>
+        <h4>Даны два выражения:</h4>
+        <div class="pair">
+          <div class="expr">$x^2 - 4$</div>
+          <div class="expr">$x + 2$</div>
+        </div>
+        <div class="find-label">✏️ Найди общий множитель:</div>
+        <div class="answer-field">Впиши сюда...</div>
+        <button class="reveal-btn" onclick="revealCommon(this)">Показать ответ</button>
+        <div class="answer-revealed">Общий множитель: $(x+2)$, так как $x^2-4=(x-2)(x+2)$</div>
+      </div>
+
+      <div class="common-task">
+        <span class="common-num">Пара 3</span>
+        <h4>Даны два выражения:</h4>
+        <div class="pair">
+          <div class="expr">$a^2 + 2ab + b^2$</div>
+          <div class="expr">$a + b$</div>
+        </div>
+        <div class="find-label">✏️ Найди общий множитель:</div>
+        <div class="answer-field">Впиши сюда...</div>
+        <button class="reveal-btn" onclick="revealCommon(this)">Показать ответ</button>
+        <div class="answer-revealed">Общий множитель: $(a+b)$, так как $a^2+2ab+b^2=(a+b)^2$</div>
+      </div>
+
+      <div class="common-task">
+        <span class="common-num">Пара 4</span>
+        <h4>Даны два выражения:</h4>
+        <div class="pair">
+          <div class="expr">$x^3 - y^3$</div>
+          <div class="expr">$x - y$</div>
+        </div>
+        <div class="find-label">✏️ Найди общий множитель:</div>
+        <div class="answer-field">Впиши сюда...</div>
+        <button class="reveal-btn" onclick="revealCommon(this)">Показать ответ</button>
+        <div class="answer-revealed">Общий множитель: $(x-y)$, так как $x^3-y^3=(x-y)(x^2+xy+y^2)$</div>
+      </div>
+
+    </div>
+
+    <div class="rule-strip">
+      <b>Совет:</b> чтобы найти общий множитель, сначала разложи каждое выражение на множители. Потом найди то, что повторяется.
+    </div>
+  </section>
+
+</main>
+
+<nav>
+  <button class="nav-prev" id="navPrev" onclick="changeSlide(-1)" disabled>← Назад</button>
+  <div class="nav-info" id="navInfo">Слайд 1 из 4</div>
+  <button class="nav-next" id="navNext" onclick="changeSlide(1)">Далее →</button>
+</nav>
+
+<script>
+/* ============================================================
+   НАВИГАЦИЯ ПО СЛАЙДАМ
+   ============================================================ */
+let current = 0;
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+const prevBtn = document.getElementById('navPrev');
+const nextBtn = document.getElementById('navNext');
+const navInfo = document.getElementById('navInfo');
+const pills = document.querySelectorAll('.progress-pill');
+
+function showSlide(i){
+  slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+  pills.forEach((p, idx) => {
+    p.classList.toggle('active', idx === i);
+    p.classList.toggle('done', idx < i);
+  });
+  prevBtn.disabled = i === 0;
+  nextBtn.disabled = i === total - 1;
+  navInfo.textContent = `Слайд ${i + 1} из ${total}`;
+  window.scrollTo({top:0, behavior:'smooth'});
+  renderMath();
+}
+
+function changeSlide(dir){
+  current = Math.min(Math.max(current + dir, 0), total - 1);
+  showSlide(current);
+}
+
+pills.forEach((p, idx) => {
+  p.addEventListener('click', () => {
+    current = idx;
+    showSlide(current);
+  });
+});
+
+/* ============================================================
+   MATHJAX
+   ============================================================ */
+function renderMath(){
+  if(window.MathJax && MathJax.typesetPromise){
+    MathJax.typesetPromise().catch(err => console.log('MathJax error:', err));
+  }
+}
+
+/* ============================================================
+   ИГРА «НАЙДИ ПАРУ»
+   ============================================================ */
+let selectedLeft = null;
+let matchedCount = 0;
+
+document.querySelectorAll('.match-item').forEach(item => {
+  item.addEventListener('click', () => {
+    if(item.classList.contains('matched')) return;
+
+    const isLeft = item.parentElement.querySelector('h3').textContent === 'Выражение';
+
+    if(isLeft){
+      document.querySelectorAll('.match-item.selected').forEach(el => {
+        if(el.parentElement.querySelector('h3').textContent === 'Выражение'){
+          el.classList.remove('selected');
+        }
+      });
+      item.classList.add('selected');
+      selectedLeft = item;
+    } else {
+      if(!selectedLeft){
+        item.classList.add('wrong');
+        setTimeout(()=>item.classList.remove('wrong'), 400);
+        return;
+      }
+      if(selectedLeft.dataset.pair === item.dataset.pair){
+        selectedLeft.classList.remove('selected');
+        selectedLeft.classList.add('matched');
+        item.classList.add('matched');
+        matchedCount++;
+        document.getElementById('match-status').textContent = `Соединено пар: ${matchedCount} / 5`;
+        if(matchedCount === 5){
+          const st = document.getElementById('match-status');
+          st.textContent = '🎉 Все пары найдены! Молодцы!';
+          st.classList.add('done');
+        }
+        selectedLeft = null;
+      } else {
+        item.classList.add('wrong');
+        selectedLeft.classList.add('wrong');
+        const left = selectedLeft;
+        setTimeout(()=>{
+          item.classList.remove('wrong');
+          left.classList.remove('wrong');
+        }, 400);
+      }
+    }
+  });
+});
+
+/* ============================================================
+   ОДЗ — ВЫБОР ВАРИАНТА
+   ============================================================ */
+document.querySelectorAll('.odz-option').forEach(opt => {
+  opt.addEventListener('click', () => {
+    const card = opt.closest('.odz-card');
+    if(card.dataset.answered === 'true') return;
+
+    const isCorrect = opt.dataset.correct === 'true';
+    if(isCorrect){
+      opt.classList.add('correct');
+      opt.querySelector('.marker').textContent = '✓';
+      card.dataset.answered = 'true';
+    } else {
+      opt.classList.add('wrong');
+      opt.querySelector('.marker').textContent = '✕';
+      setTimeout(()=>{
+        opt.classList.remove('wrong');
+        opt.querySelector('.marker').textContent = '';
+      }, 800);
+    }
+  });
+});
+
+/* ============================================================
+   ОБЩИЕ МНОЖИТЕЛИ
+   ============================================================ */
+function revealCommon(btn){
+  const task = btn.closest('.common-task');
+  const answer = task.querySelector('.answer-revealed');
+  answer.classList.add('show');
+  btn.style.display = 'none';
+}
+
+/* ============================================================
+   ИНИЦИАЛИЗАЦИЯ
+   ============================================================ */
+window.addEventListener('load', () => {
+  showSlide(0);
+  renderMath();
+  setTimeout(renderMath, 500);
+  setTimeout(renderMath, 1500);
+});
+</script>
+
+</body>
+</html>
