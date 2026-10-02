@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Основной урок · Преобразование рациональных выражений</title>
+<script>
+MathJax = {
+  tex: {inlineMath: [['$','$'],['\\(','\\)']]},
+  svg: {fontCache: 'global'}
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root{
+    --orange:#ea580c;
+    --orange-dark:#c2410c;
+    --orange-light:#ffedd5;
+    --orange-soft:#fed7aa;
+    --amber:#f59e0b;
+    --amber-dark:#d97706;
+    --amber-light:#fef3c7;
+    --ok:#10b981;
+    --ok-light:#d1fae5;
+    --err:#ef4444;
+    --text:#1e293b;
+    --muted:#78716c;
+    --border:#fed7aa;
+    --grid-line:#fed7aa;
+    --grid-strong:#fdba74;
+    --bg:#fffbf5;
+  }
+  *{box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 5% -5%, #ffedd5 0%, transparent 55%),
+      radial-gradient(900px 500px at 100% 100%, #fef3c7 0%, transparent 55%),
+      #fffbf5;
+    min-height:100vh;color:var(--text);
+    display:flex;flex-direction:column;
+    position:relative;
+    overflow-x:hidden;
+  }
+
+  /* ============ ДЕКОРАТИВНЫЕ ЛИСТОЧКИ НА ФОНЕ ============ */
+  .bg-leaf{
+    position:fixed;
+    pointer-events:none;
+    opacity:.18;
+    z-index:0;
+    user-select:none;
+  }
+  .bg-leaf.l1{top:8%;left:3%;transform:rotate(-25deg);font-size:80px;}
+  .bg-leaf.l2{top:30%;right:5%;transform:rotate(35deg);font-size:120px;}
+  .bg-leaf.l3{bottom:15%;left:8%;transform:rotate(15deg);font-size:100px;}
+  .bg-leaf.l4{bottom:8%;right:12%;transform:rotate(-45deg);font-size:70px;}
+  .bg-leaf.l5{top:55%;left:45%;transform:rotate(70deg);font-size:90px;opacity:.1;}
+  .bg-leaf.l6{top:5%;right:30%;transform:rotate(-10deg);font-size:60px;opacity:.13;}
+  .bg-leaf.l7{bottom:35%;left:25%;transform:rotate(120deg);font-size:75px;opacity:.11;}
+  .bg-leaf.l8{top:70%;right:3%;transform:rotate(-60deg);font-size:95px;opacity:.15;}
+
+  /* ============ HEADER ============ */
+  header{
+    padding:14px 28px;
+    display:flex;justify-content:space-between;align-items:center;
+    background:rgba(255,251,245,.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+    flex-wrap:wrap;gap:10px;
+    position:relative;z-index:10;
+  }
+  .header-title{
+    font-size:15px;font-weight:800;
+    color:var(--orange-dark);
+    letter-spacing:.3px;
+  }
+  .header-title span{
+    color:var(--muted);font-weight:600;margin-left:8px;
+  }
+  .progress-pills{
+    display:flex;gap:8px;align-items:center;
+  }
+  .progress-pill{
+    height:34px;min-width:34px;padding:0 14px;border-radius:17px;
+    background:#fff;border:2px solid var(--border);
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:800;color:var(--muted);
+    transition:.3s;cursor:pointer;
+  }
+  .progress-pill:hover{border-color:var(--orange);color:var(--orange);}
+  .progress-pill.active{
+    background:linear-gradient(135deg,var(--orange),var(--amber));
+    color:#fff;border-color:transparent;
+    box-shadow:0 4px 14px rgba(234,88,12,.35);
+  }
+  .progress-pill.done{
+    background:var(--ok-light);color:var(--ok);
+    border-color:var(--ok);
+  }
+
+  /* ============ MAIN ============ */
+  main{
+    flex:1;padding:28px 20px 120px;
+    display:flex;justify-content:center;
+    position:relative;z-index:5;
+  }
+  .slide{
+    display:none;
+    background:var(--bg);border-radius:22px;
+    padding:32px 40px;
+    box-shadow:0 14px 50px rgba(234,88,12,.12);
+    border:1px solid var(--border);
+    width:100%;max-width:1200px;
+    animation:fade .4s ease;
+    position:relative;
+    overflow:hidden;
+  }
+  .slide::before{
+    content:'';
+    position:absolute;top:-50px;right:-50px;
+    width:200px;height:200px;
+    background:radial-gradient(circle, rgba(254,215,170,.5) 0%, transparent 70%);
+    pointer-events:none;
+  }
+  .slide::after{
+    content:'🌿';
+    position:absolute;bottom:-10px;right:20px;
+    font-size:120px;opacity:.06;
+    transform:rotate(-20deg);
+    pointer-events:none;
+  }
+  .slide.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
+
+  .slide-tag{
+    display:inline-block;
+    background:var(--amber-light);color:var(--amber-dark);
+    padding:5px 14px;border-radius:20px;
+    font-size:13px;font-weight:700;margin-bottom:14px;
+    border:1px solid rgba(245,158,11,.3);
+    position:relative;z-index:2;
+  }
+  .slide h2{
+    font-size:26px;margin:0 0 6px;color:var(--orange-dark);font-weight:800;
+    letter-spacing:-.3px;
+    position:relative;z-index:2;
+  }
+  .slide .subtitle{
+    color:var(--muted);font-size:15px;margin:0 0 22px;
+    position:relative;z-index:2;
+  }
+
+  /* ============ ПРАВИЛО ============ */
+  .rule-box{
+    background:linear-gradient(135deg,#fff7ed,#ffedd5);
+    border-left:5px solid var(--orange);
+    border-radius:12px;
+    padding:14px 20px;
+    margin:16px 0 24px;
+    font-size:15px;
+    position:relative;z-index:2;
+  }
+  .rule-box b{color:var(--orange-dark);}
+  .rule-box.warn{background:linear-gradient(135deg,#fef3c7,#fde68a);border-color:var(--amber-dark);}
+  .rule-box.warn b{color:var(--amber-dark);}
+
+  /* ============ СХЕМА ============ */
+  .scheme{
+    display:flex;align-items:center;gap:10px;
+    flex-wrap:wrap;
+    background:#fff;
+    border-radius:12px;
+    padding:12px 18px;
+    margin:14px 0 20px;
+    font-size:14px;
+    border:1px dashed var(--border);
+    position:relative;z-index:2;
+  }
+  .scheme .step{
+    background:#fff;border:2px solid var(--orange);
+    color:var(--orange-dark);font-weight:700;
+    padding:5px 14px;border-radius:20px;
+    font-size:13px;
+  }
+  .scheme .arrow{color:var(--muted);font-size:16px;}
+
+  /* ============ СЕТКА ЗАДАНИЙ (2 колонки × 3 ряда) ============ */
+  .task-grid{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:18px;
+    margin-top:14px;
+    position:relative;z-index:2;
+  }
+  @media (max-width:850px){.task-grid{grid-template-columns:1fr;}}
+
+  /* ============ КЛЕТЧАТОЕ ПОЛЕ С ПРИМЕРОМ В ЛЕВОМ ВЕРХНЕМ УГЛУ ============ */
+  .solution-cell{
+    background:#fffdf9;
+    border:2px dashed var(--amber);
+    border-radius:14px;
+    padding:16px 18px;
+    position:relative;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size:22px 22px;
+    min-height:200px;
+    display:flex;
+    flex-direction:column;
+    transition:.2s;
+  }
+  .solution-cell:hover{
+    border-color:var(--orange);
+    box-shadow:0 8px 24px rgba(234,88,12,.1);
+  }
+  .solution-cell::before{
+    content:'✏️ Решение';
+    position:absolute;top:-11px;left:16px;
+    background:#fffdf9;padding:0 10px;
+    font-size:11px;font-weight:800;
+    color:var(--amber-dark);
+    letter-spacing:.5px;
+    text-transform:uppercase;
+    border-radius:6px;
+  }
+
+  /* Шапка: номер + пример в углу */
+  .solution-cell .cell-head{
+    display:flex;align-items:flex-start;gap:12px;
+    margin-bottom:10px;
+    flex-shrink:0;
+  }
+  .solution-cell .task-num{
+    display:inline-flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,var(--orange),var(--amber));
+    color:#fff;
+    font-weight:800;font-size:13px;
+    width:32px;height:32px;border-radius:10px;
+    box-shadow:0 3px 10px rgba(234,88,12,.3);
+    flex-shrink:0;
+  }
+  .solution-cell .task-num.hard{
+    background:linear-gradient(135deg,#dc2626,#ea580c);
+    box-shadow:0 3px 10px rgba(220,38,38,.3);
+  }
+  .solution-cell .task-num.easy{
+    background:linear-gradient(135deg,#10b981,#059669);
+    box-shadow:0 3px 10px rgba(16,185,129,.3);
+  }
+
+  /* Пример — в левом верхнем углу, рядом с номером */
+  .solution-cell .example-inline{
+    background:rgba(255,247,237,.9);
+    border-radius:10px;
+    padding:10px 14px;
+    font-size:19px;
+    font-weight:600;
+    line-height:1.6;
+    color:var(--text);
+    border:1px solid rgba(234,88,12,.15);
+    flex-shrink:0;
+    max-width:100%;
+    word-break:break-word;
+  }
+
+  /* Свободное место под решение */
+  .solution-cell .work-area{
+    flex:1;
+    min-height:100px;
+  }
+
+  /* ============ ОБРАЗЕЦ ============ */
+  .sample{
+    background:linear-gradient(135deg,#ecfdf5,#d1fae5);
+    border-left:5px solid var(--ok);
+    border-radius:12px;
+    padding:16px 22px;
+    margin-top:24px;
+    font-size:16px;
+    color:#065f46;
+    line-height:1.7;
+    position:relative;z-index:2;
+  }
+  .sample .sample-title{
+    font-weight:800;font-size:13px;
+    text-transform:uppercase;letter-spacing:.5px;
+    margin-bottom:8px;
+    display:flex;align-items:center;gap:8px;
+  }
+
+  /* ============ NAVIGATION ============ */
+  nav{
+    position:fixed;bottom:0;left:0;right:0;
+    padding:16px 28px;
+    background:rgba(255,251,245,.9);
+    backdrop-filter:blur(10px);
+    border-top:1px solid var(--border);
+    display:flex;justify-content:space-between;align-items:center;gap:14px;
+    z-index:100;
+  }
+  nav button{
+    padding:13px 28px;border:none;border-radius:12px;
+    font-size:15px;font-weight:700;cursor:pointer;
+    transition:.2s;
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  nav .nav-prev{
+    background:#fff;color:var(--orange);
+    border:2px solid var(--orange);
+  }
+  nav .nav-prev:hover:not(:disabled){background:var(--orange-light);}
+  nav .nav-next{
+    background:linear-gradient(135deg,var(--orange),var(--amber));
+    color:#fff;
+    box-shadow:0 4px 14px rgba(234,88,12,.35);
+  }
+  nav .nav-next:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 20px rgba(234,88,12,.45);}
+  nav button:disabled{opacity:.4;cursor:not-allowed;transform:none !important;box-shadow:none !important;}
+  nav .nav-info{
+    font-size:14px;font-weight:700;color:var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<!-- ДЕКОРАТИВНЫЕ ЛИСТОЧКИ НА ФОНЕ -->
+<span class="bg-leaf l1">🌿</span>
+<span class="bg-leaf l2">🍃</span>
+<span class="bg-leaf l3">🌱</span>
+<span class="bg-leaf l4">🌿</span>
+<span class="bg-leaf l5">🍃</span>
+<span class="bg-leaf l6">🌱</span>
+<span class="bg-leaf l7">🌿</span>
+<span class="bg-leaf l8">🍃</span>
+
+<header>
+  <div class="header-title">Основной урок <span>· Преобразование рациональных выражений</span></div>
+  <div class="progress-pills">
+    <div class="progress-pill active" data-slide="0">Задание 1</div>
+    <div class="progress-pill" data-slide="1">Задание 2</div>
+    <div class="progress-pill" data-slide="2">Задание 3</div>
+    <div class="progress-pill" data-slide="3">Задание 4</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- =========================================================
+       СЛАЙД 1. СОКРАТИТЕ ДРОБЬ (№0.27)
+       ========================================================= -->
+  <section class="slide active">
+    <span class="slide-tag">Задание 1 · Сократите дробь</span>
+    <h2>Сокращение дробей с разложением на множители</h2>
+    <p class="subtitle">Разложи числитель и знаменатель на множители, затем сократи одинаковые множители.</p>
+
+    <div class="rule-box">
+      <b>Помни:</b> сокращать можно только <b>множители</b>, а не слагаемые! Сначала разложи на множители — потом сокращай.
+    </div>
+
+    <div class="scheme">
+      <span class="step">1. Разложить</span>
+      <span class="arrow">→</span>
+      <span class="step">2. Сократить множители</span>
+      <span class="arrow">→</span>
+      <span class="step">3. Записать ОДЗ</span>
+    </div>
+
+    <div class="task-grid">
+
+      <!-- 1 -->
+      <div class="solution-cell">
+        <div class="cell-head">
+          <span class="task-num">1</span>
+          <div class="example-inline">$\dfrac{ab - 3b - 2a + 6}{15 - 5a}$</div>
+        </div>
+        <div class="work-area"></div>
+      </div>
+
+      <!-- 2 -->
+      <div class="solution-cell">
+        <div class="cell-head">
+          <span class="task-num">2</span>
+          <div class="example-inline">$\dfrac{7p - 35}{15 - 3p}$</div>
+        </div>
+        <div class="work-area"></div>
+      </div>
+
+      <!-- 3 -->
+      <div class="solution-cell">
+        <div class="cell-head">
+          <span class="task-num">3</span>
+          <div class="example-inline">$\dfrac{18a - 3a^2}{8a^2 - 48a}$</div>
+        </div>
+        <div class="work-area"></div>
+      </div>
+
+      <!-- 4 -->
+      <div class="solution-cell">
+        <div class="cell-head">
+          <span class="task-num">4</span>
+          <div class="example-inline">$\dfrac{4 - x^2}{10 - 5x}$</div>
+        </div>
+        <div class="work-area"></div>
+      </div>
+
+      <!-- 5 -->
+      <div class="solution-cell">
+        <div class="cell-head">
+          <span class="task-num">5</span>
+          <div class="example-inline">$\dfrac{a^2 + 3a + 9}{27 - a^3}$</div>
+        </div>
+        <div class="work-area"></div>
+      </div>
+
+      <!-- 6 -->
+      <div class="solution-cell">
+        <div class="cell-head">
+          <span class="task-num hard">6</span>
+          <div class="example-inline">$\dfrac{x^6 - x^8}{x^4 - x^2}$</div>
+        </div>
+        <div class="work-area"></div>
+      </div>
+
+    </div>
+
+    <div class="sample">
+      <div class="sample-title">✅ Образец решения (пример 1)</div>
+      $\dfrac{ab - 3b - 2a + 6}{15 - 5a} = \dfrac{b(a-3) - 2(a-3)}{5(3-a)} = \dfrac{(a-3)(b-2)}{-5(a-3)} = -\dfrac{b-2}{5}$,<br>
+      при $a \neq 3$.
+    </div>
+  </section>
+
+  <!-- =========================================================
+       СЛАЙД 2. ПРЕОБРАЗУЙТЕ ДРОБЬ (№0.28)
+       ========================================================= -->
+  <section class="slide">
+    <span class="slide-tag">Задание 2 · Преобразуйте дробь</span>
+    <h2>Приведи дробь к заданному знаменателю</h2>
+    <p class="subtitle">Умножь числитель и знаменатель на такой множитель, чтобы получился нужный знаменатель.</p>
+
+    <div class="rule-box">
+      <b>Правило:</b> основное свойство дроби: $\dfrac{A}{B} = \dfrac{A \cdot M}{B \cdot M}$. Умножаем числитель и знаменатель на <b>один и тот же</b> множитель $M$.
+    </div>
+
+    <div class="scheme">
+      <span class="step">1. Разложить новый знаменатель</span>
+      <span class="arrow">→</span>
+      <span class="step">2. Найти доп. множитель</span>
+      <span class="arrow">→</span>
+      <span class="step">3. Умножить</span>
+    </div>
+
+    <div class="task-grid">
+
+      <!-- 1 -->
+      <div class="solution-cell">
+        <div class="cell-head">
+          <span class="task-num easy">1</span>
+          <div class="example-inline">$\dfrac{x}{a-b} = \dfrac{?}{(a-b)^2}$</div>
+        </div>
+        <div class="work-area"></div>
+      </div>
+
+      <!-- 2 -->
+      <div class="solution-cell">
+        <div class="cell-head">
+          <span class="task-num easy">2</span>
+          <div class="example-inline">$\dfrac{2y}{x-1} = \dfrac{?}{x^3 - 1}$</div>
+        </div>
+        <div class="work-area"></div>
+      </div>
+
+      <!-- 3 -->
+      <div class="solution-cell">
+        <div class="cell-head">
+          <span class="task-num">3</span>
+          <div class="example-inline">$\dfrac{y}{x-a} = \dfrac{?}{x^2 - a^2}$</div>
+        </div>
+        <div class="work-area"></div>
+      </div>
+
+      <!-- 4 -->
+      <div class="solution-cell">
+        <div class="cell-head">
+          <span class="task-num">4</span>
+          <div class="example-inline">$\dfrac{3a}{a^2 + ab + b^2} = \dfrac{?}{a^3 - b^3}$</div>
+        </div>
+        <div class="work-area"></div>
+      </div>
+
+      <!-- 5 -->
+      <div class="solution-cell">
+        <div class="cell-head">
+          <span class="task-num">5</span>
+          <div class="example-inline">$\dfrac{8}{3xy^2} = \dfrac{?}{15x^2y^2}$</div>
+        </div>
+        <div class="work-area"></div>
+      </div>
+
+      <!-- 6 -->
+      <div class="solution-cell">
+        <div class="cell-head">
+          <span class="task-num hard">6</span>
+          <div class="example-inline">$\dfrac{1}{x+1} = \dfrac{?}{x^3 + 1}$</div>
+        </div>
+        <div class="work-area"></div>
+      </div>
+
+    </div>
+
+    <div class="sample">
+      <div class="sample-title">✅ Образец решения (пример 1)</div>
+      $\dfrac{x}{a-b} = \dfrac{x \cdot (a-b)}{(a-b) \cdot (a-b)} = \dfrac{ax - bx}{(a-b)^2}$, при $a \neq b$.
+    </div>
+  </section>
+
+  <!-- =========================================================
+       СЛАЙД 3. ВЫПОЛНИТЕ ДЕЙСТВИЯ (№0.10)
+       ========================================================= -->
+  <section class="slide">
+    <span class="slide-tag">Задание 3 · Выполните указанные действия</span>
+    <h2>Сложение, вычитание, умножение и деление дробей</h2>
+    <p class="subtitle">Определи порядок действий. Помни про общий знаменатель и замену деления умножением.</p>
+
+    <div class="rule-box warn">
+      <b>Внимание:</b> при сложении/вычитании — общий знаменатель. При делении — умножение на обратную дробь. При умножении — числитель на числитель, знаменатель на знаменатель.
+    </div>
+
+    <div class="scheme">
+      <span class="step">1. Определить действие</span>
+      <span class="arrow">→</span>
+      <span class="step">2. Выполнить</span>
+      <span class="arrow">→</span>
+      <span class="step">3. Сократить</span>
+    </div>
+
+    <div class="task-grid">
+
+      <!-- 1 -->
+      <div class="solution-cell">
+        <div class="cell-head">
+          <span class="task-num">1</span>
+          <div class="example-inline">$\dfrac{x}{x-y} + \dfrac{y}{y-x}$</div>
+        </div>
+        <div class="work-area"></div>
+      </div>
+
+      <!-- 2 -->
+      <div class="solution-cell">
+        <div class="cell-head">
+          <span class="task-num">2</span>
+          <div class="example-inline">$\dfrac{2x+1}{a} + \dfrac{3x+1}{a} - \dfrac{x-2}{a}$</div>
+        </div>
+        <div class="work-area"></div>
+      </div>
+
+      <!-- 3 -->
+      <div class="solution-cell">
+        <div class="cell-head">
+          <span class="task-num">3</span>
+          <div class="example-inline">$\dfrac{a}{12m} - \dfrac{b}{18n}$</div>
+        </div>
+        <div class="work-area"></div>
+      </div>
+
+      <!-- 4 -->
+      <div class="solution-cell">
+        <div class="cell-head">
+          <span class="task-num">4</span>
+          <div class="example-inline">$\dfrac{3xy}{4mn} \cdot \dfrac{10m^2n^2}{21x^2y}$</div>
+        </div>
+        <div class="work-area"></div>
+      </div>
+
+      <!-- 5 -->
+      <div class="solution-cell">
+        <div class="cell-head">
+          <span class="task-num hard">5</span>
+          <div class="example-inline">$-\dfrac{18a^2b^2}{5pq} : \dfrac{6ab}{5p^2q^2}$</div>
+        </div>
+        <div class="work-area"></div>
+      </div>
+
+      <!-- 6 -->
+      <div class="solution-cell">
+        <div class="cell-head">
+          <span class="task-num hard">6</span>
+          <div class="example-inline">$\dfrac{x^2y - 4y^3}{3xy^2} \cdot \dfrac{yx^2}{x^2 - 2xy}$</div>
+        </div>
+        <div class="work-area"></div>
+      </div>
+
+    </div>
+
+    <div class="sample">
+      <div class="sample-title">✅ Образец решения (пример 2)</div>
+      $\dfrac{2x+1 + 3x+1 - (x-2)}{a} = \dfrac{2x+1+3x+1-x+2}{a} = \dfrac{4x+4}{a} = \dfrac{4(x+1)}{a}$,<br>
+      при $a \neq 0$.
+    </div>
+  </section>
+
+  <!-- =========================================================
+       СЛАЙД 4. УПРОСТИТЕ ВЫРАЖЕНИЕ (№0.13)
+       ========================================================= -->
+  <section class="slide">
+    <span class="slide-tag">Задание 4 · Упростите выражение</span>
+    <h2>Упрощение выражений со скобками и дробями</h2>
+    <p class="subtitle">Сначала выполни действия в скобках, потом умножение/деление.</p>
+
+    <div class="rule-box warn">
+      <b>Внимание:</b> целое выражение — это дробь со знаменателем 1. При вычитании/сложении в скобке приводим к общему знаменателю.
+    </div>
+
+    <div class="scheme">
+      <span class="step">1. Скобки</span>
+      <span class="arrow">→</span>
+      <span class="step">2. Умножение/деление</span>
+      <span class="arrow">→</span>
+      <span class="step">3. Сокращение</span>
+    </div>
+
+    <div class="task-grid">
+
+      <!-- 1 -->
+      <div class="solution-cell">
+        <div class="cell-head">
+          <span class="task-num">1</span>
+          <div class="example-inline">$\left( \dfrac{a}{a+1} + 1 \right) \cdot \dfrac{1+a}{2a+1}$</div>
+        </div>
+        <div class="work-area"></div>
+      </div>
+
+      <!-- 2 -->
+      <div class="solution-cell">
+        <div class="cell-head">
+          <span class="task-num hard">2</span>
+          <div class="example-inline">$\left( \dfrac{m}{n^2} - \dfrac{1}{m} \right) : \left( \dfrac{1}{n} + \dfrac{1}{m} \right)$</div>
+        </div>
+        <div class="work-area"></div>
+      </div>
+
+      <!-- 3 -->
+      <div class="solution-cell">
+        <div class="cell-head">
+          <span class="task-num hard">3</span>
+          <div class="example-inline">$\dfrac{b-2}{b-3} \cdot \left( b + \dfrac{b}{2-b} \right)$</div>
+        </div>
+        <div class="work-area"></div>
+      </div>
+
+      <!-- 4 -->
+      <div class="solution-cell">
+        <div class="cell-head">
+          <span class="task-num hard">4</span>
+          <div class="example-inline">$\left( \dfrac{4x}{2-x} - x \right) : \dfrac{x+2}{x-2}$</div>
+        </div>
+        <div class="work-area"></div>
+      </div>
+
+      <!-- 5 -->
+      <div class="solution-cell">
+        <div class="cell-head">
+          <span class="task-num hard">5</span>
+          <div class="example-inline">$\left( \dfrac{a}{b} - \dfrac{b}{a} \right) \cdot \dfrac{ab}{a^2 - b^2}$</div>
+        </div>
+        <div class="work-area"></div>
+      </div>
+
+      <!-- 6 -->
+      <div class="solution-cell">
+        <div class="cell-head">
+          <span class="task-num hard">6</span>
+          <div class="example-inline">$\left( \dfrac{x}{y} + \dfrac{y}{x} \right) \cdot \dfrac{xy}{x^2 + y^2}$</div>
+        </div>
+        <div class="work-area"></div>
+      </div>
+
+    </div>
+
+    <div class="sample">
+      <div class="sample-title">✅ Образец решения (пример 1)</div>
+      $\left( \dfrac{a}{a+1} + \dfrac{a+1}{a+1} \right) \cdot \dfrac{1+a}{2a+1} = \dfrac{2a+1}{a+1} \cdot \dfrac{a+1}{2a+1} = 1$,<br>
+      при $a \neq -1,\ a \neq -\dfrac{1}{2}$.
+    </div>
+  </section>
+
+</main>
+
+<nav>
+  <button class="nav-prev" id="navPrev" onclick="changeSlide(-1)" disabled>← Назад</button>
+  <div class="nav-info" id="navInfo">Слайд 1 из 4</div>
+  <button class="nav-next" id="navNext" onclick="changeSlide(1)">Далее →</button>
+</nav>
+
+<script>
+/* ============================================================
+   НАВИГАЦИЯ
+   ============================================================ */
+let current = 0;
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+const prevBtn = document.getElementById('navPrev');
+const nextBtn = document.getElementById('navNext');
+const navInfo = document.getElementById('navInfo');
+const pills = document.querySelectorAll('.progress-pill');
+
+function showSlide(i){
+  slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+  pills.forEach((p, idx) => {
+    p.classList.toggle('active', idx === i);
+    p.classList.toggle('done', idx < i);
+  });
+  prevBtn.disabled = i === 0;
+  nextBtn.disabled = i === total - 1;
+  navInfo.textContent = `Слайд ${i + 1} из ${total}`;
+  window.scrollTo({top:0, behavior:'smooth'});
+  renderMath();
+}
+
+function changeSlide(dir){
+  current = Math.min(Math.max(current + dir, 0), total - 1);
+  showSlide(current);
+}
+
+pills.forEach((p, idx) => {
+  p.addEventListener('click', () => {
+    current = idx;
+    showSlide(current);
+  });
+});
+
+/* ============================================================
+   MATHJAX
+   ============================================================ */
+function renderMath(){
+  if(window.MathJax && MathJax.typesetPromise){
+    MathJax.typesetPromise().catch(err => console.log('MathJax error:', err));
+  }
+}
+
+window.addEventListener('load', () => {
+  showSlide(0);
+  renderMath();
+  setTimeout(renderMath, 500);
+  setTimeout(renderMath, 1500);
+});
+</script>
+
+</body>
+</html>
