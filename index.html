@@ -16,11 +16,11 @@ MathJax = {
     --orange:#ea580c;
     --orange-dark:#c2410c;
     --orange-light:#ffedd5;
-    --orange-soft:#fed7aa;
     --amber:#f59e0b;
     --amber-dark:#d97706;
     --amber-light:#fef3c7;
-    --ok:#10b981;
+    --green:#16a34a;
+    --green-light:#dcfce7;
     --text:#1e293b;
     --muted:#78716c;
     --border:#fed7aa;
@@ -41,12 +41,7 @@ MathJax = {
   }
 
   /* Декоративные листочки */
-  .bg-leaf{
-    position:fixed;
-    pointer-events:none;
-    z-index:0;
-    user-select:none;
-  }
+  .bg-leaf{position:fixed;pointer-events:none;z-index:0;user-select:none;}
   .bg-leaf.l1{top:6%;left:3%;transform:rotate(-25deg);font-size:100px;opacity:.16;}
   .bg-leaf.l2{top:35%;right:4%;transform:rotate(35deg);font-size:140px;opacity:.12;}
   .bg-leaf.l3{bottom:10%;left:10%;transform:rotate(15deg);font-size:110px;opacity:.14;}
@@ -63,9 +58,7 @@ MathJax = {
     position:relative;z-index:10;
     flex-wrap:wrap;gap:14px;
   }
-  .brand{
-    display:flex;align-items:center;gap:14px;
-  }
+  .brand{display:flex;align-items:center;gap:14px;}
   .brand-icon{
     width:54px;height:54px;border-radius:16px;
     background:linear-gradient(135deg,var(--orange),var(--amber));
@@ -77,9 +70,7 @@ MathJax = {
     margin:0;font-size:19px;font-weight:800;
     color:var(--orange-dark);letter-spacing:-.2px;
   }
-  .brand-text p{
-    margin:2px 0 0;font-size:13px;color:var(--muted);
-  }
+  .brand-text p{margin:2px 0 0;font-size:13px;color:var(--muted);}
 
   /* MAIN */
   main{
@@ -93,24 +84,153 @@ MathJax = {
 
   .page-intro{
     text-align:center;
-    margin-bottom:44px;
+    margin-bottom:32px;
   }
   .page-intro h2{
-    font-size:36px;
+    font-size:34px;
     margin:0 0 10px;
     color:var(--orange-dark);
     font-weight:800;
     letter-spacing:-.5px;
   }
   .page-intro p{
-    font-size:16px;
+    font-size:15px;
     color:var(--muted);
-    margin:0;
-    max-width:600px;
     margin:0 auto;
+    max-width:640px;
+    line-height:1.5;
   }
 
-  /* СЕКЦИЯ УРОКОВ */
+  /* ============================================================
+     БЫСТРЫЙ ДОСТУП
+     ============================================================ */
+  .quick-access{
+    background:linear-gradient(135deg,#fff7ed,#ffedd5);
+    border:2px solid var(--amber);
+    border-radius:20px;
+    padding:22px 26px;
+    margin-bottom:36px;
+    position:relative;
+    box-shadow:0 10px 32px rgba(245,158,11,.15);
+  }
+  .quick-access::before{
+    content:'⚡ Быстрый доступ к разделам';
+    position:absolute;
+    top:-14px;left:22px;
+    background:#fffbf5;
+    padding:2px 14px;
+    font-size:13px;
+    font-weight:800;
+    color:var(--amber-dark);
+    letter-spacing:.3px;
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(245,158,11,.2);
+  }
+
+  .quick-hint{
+    font-size:12px;
+    color:var(--amber-dark);
+    font-style:italic;
+    margin:0 0 14px;
+    text-align:center;
+    opacity:.85;
+  }
+
+  .quick-lesson{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    padding:12px 0;
+    border-bottom:1px dashed rgba(245,158,11,.3);
+  }
+  .quick-lesson:last-child{border-bottom:none;}
+  .quick-lesson.draft{opacity:.5;}
+
+  .quick-lesson-title{
+    font-size:13px;
+    font-weight:800;
+    color:var(--orange-dark);
+    letter-spacing:.2px;
+    margin:0 0 4px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .quick-lesson-title .num{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:22px;height:22px;
+    border-radius:7px;
+    background:linear-gradient(135deg,var(--orange),var(--amber));
+    color:#fff;
+    font-size:12px;
+    font-weight:800;
+  }
+  .quick-lesson.draft .quick-lesson-title .num{
+    background:linear-gradient(135deg,#a8a29e,#d6d3d1);
+  }
+  .quick-lesson-title .soon{
+    background:#e7e5e4;
+    color:#57534e;
+    font-size:10px;
+    font-weight:800;
+    padding:2px 8px;
+    border-radius:8px;
+    margin-left:6px;
+    letter-spacing:.3px;
+  }
+
+  .quick-links{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+
+  .quick-link{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 14px;
+    background:#fff;
+    border:2px solid var(--border);
+    border-radius:10px;
+    text-decoration:none;
+    color:var(--text);
+    font-size:13px;
+    font-weight:700;
+    transition:.2s;
+    cursor:pointer;
+    position:relative;
+  }
+  .quick-link:hover{
+    border-color:var(--orange);
+    background:var(--orange-light);
+    transform:translateY(-1px);
+    box-shadow:0 4px 12px rgba(234,88,12,.15);
+  }
+  .quick-link .ico{font-size:15px;}
+
+  .quick-link.test{
+    border-color:#86efac;
+    background:#f0fdf4;
+    color:#166534;
+  }
+  .quick-link.test:hover{
+    border-color:var(--green);
+    background:var(--green-light);
+    box-shadow:0 4px 12px rgba(22,163,74,.2);
+  }
+
+  .quick-link.disabled{
+    background:#fafaf9;
+    border-style:dashed;
+    border-color:#d6d3d1;
+    color:#a8a29e;
+    pointer-events:none;
+  }
+
+  /* Секция «Уроки» */
   .section-title{
     display:flex;
     align-items:center;
@@ -130,7 +250,9 @@ MathJax = {
     background:linear-gradient(90deg, var(--border), transparent);
   }
 
-  /* КАРТОЧКА УРОКА */
+  /* ============================================================
+     КАРТОЧКИ УРОКОВ (как было)
+     ============================================================ */
   .lessons-list{
     display:flex;
     flex-direction:column;
@@ -154,8 +276,12 @@ MathJax = {
     border-color:var(--orange);
     box-shadow:0 14px 40px rgba(234,88,12,.18);
   }
+  .lesson-card.draft{
+    border-style:dashed;
+    opacity:.85;
+  }
+  .lesson-card.draft:hover{opacity:1;border-color:var(--amber);}
 
-  /* Шапка карточки (клик — раскрыть) */
   .lesson-header{
     padding:22px 28px;
     display:flex;
@@ -181,21 +307,30 @@ MathJax = {
     flex-shrink:0;
     box-shadow:0 6px 18px rgba(234,88,12,.3);
   }
-
-  .lesson-info{
-    flex:1;
+  .lesson-card.draft .lesson-num{
+    background:linear-gradient(135deg,#d6d3d1,#a8a29e);
+    box-shadow:0 6px 18px rgba(120,113,108,.25);
   }
+
+  .lesson-info{flex:1;}
   .lesson-info h4{
     margin:0 0 4px;
     font-size:20px;
     font-weight:800;
     color:var(--text);
   }
-  .lesson-info p{
-    margin:0;
-    font-size:14px;
-    color:var(--muted);
+  .lesson-info .formula{
+    display:inline-block;
+    background:var(--amber-light);
+    color:var(--amber-dark);
+    padding:2px 10px;
+    border-radius:8px;
+    font-size:15px;
+    font-weight:700;
+    margin-left:6px;
+    vertical-align:middle;
   }
+  .lesson-info p{margin:4px 0 0;font-size:14px;color:var(--muted);}
 
   .lesson-toggle{
     width:38px;height:38px;border-radius:50%;
@@ -214,25 +349,24 @@ MathJax = {
     border-color:transparent;
     transform:rotate(180deg);
   }
+  .lesson-card.draft.open .lesson-toggle{
+    background:linear-gradient(135deg,#d6d3d1,#a8a29e);
+  }
 
-  /* Выпадающий список частей урока */
   .lesson-parts{
     max-height:0;
     overflow:hidden;
-    transition:max-height .4s ease;
+    transition:max-height .45s ease;
     background:#fff;
   }
-  .lesson-card.open .lesson-parts{
-    max-height:600px;
-  }
+  .lesson-card.open .lesson-parts{max-height:900px;}
   .lesson-parts-inner{
     padding:20px 28px 26px;
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
     gap:14px;
   }
 
-  /* Кнопка-часть урока */
   .part-link{
     text-decoration:none;
     display:flex;
@@ -263,9 +397,33 @@ MathJax = {
     transform:translateY(-2px);
     box-shadow:0 8px 22px rgba(234,88,12,.15);
   }
-  .part-link:hover::before{
-    transform:scaleY(1);
+  .part-link:hover::before{transform:scaleY(1);}
+
+  .part-link.test{
+    background:linear-gradient(135deg,#f0fdf4,#fffdf9);
+    border-color:#86efac;
   }
+  .part-link.test::before{
+    background:linear-gradient(180deg,var(--green),#22c55e);
+  }
+  .part-link.test:hover{
+    border-color:var(--green);
+    background:linear-gradient(135deg,#dcfce7,#f0fdf4);
+    box-shadow:0 8px 22px rgba(22,163,74,.2);
+  }
+
+  .part-link.draft{
+    background:#fafaf9;
+    border-style:dashed;
+    border-color:#d6d3d1;
+    opacity:.7;
+    cursor:default;
+    pointer-events:none;
+  }
+  .part-link.draft::before{background:linear-gradient(180deg,#a8a29e,#d6d3d1);}
+  .part-link.draft .part-icon{background:linear-gradient(135deg,#f5f5f4,#e7e5e4);}
+  .part-link.draft .part-info h5{color:#57534e;}
+  .part-link.draft .part-info p{color:#a8a29e;}
 
   .part-icon{
     width:44px;height:44px;border-radius:12px;
@@ -279,6 +437,12 @@ MathJax = {
     background:linear-gradient(135deg,var(--orange),var(--amber));
     transform:scale(1.08) rotate(-6deg);
   }
+  .part-link.test .part-icon{
+    background:linear-gradient(135deg,#dcfce7,#bbf7d0);
+  }
+  .part-link.test:hover .part-icon{
+    background:linear-gradient(135deg,var(--green),#22c55e);
+  }
 
   .part-info h5{
     margin:0 0 3px;
@@ -286,27 +450,31 @@ MathJax = {
     font-weight:800;
     color:var(--text);
   }
-  .part-info p{
-    margin:0;
-    font-size:12px;
-    color:var(--muted);
-    line-height:1.4;
-  }
+  .part-link.test .part-info h5{color:#166534;}
+  .part-info p{margin:0;font-size:12px;color:var(--muted);line-height:1.4;}
+  .part-link.test .part-info p{color:#166534;opacity:.75;}
 
-  /* Пустое состояние */
-  .empty-state{
-    text-align:center;
-    padding:60px 20px;
-    background:linear-gradient(135deg,#fffdf9,#fff7ed);
-    border:2px dashed var(--border);
-    border-radius:20px;
-    color:var(--muted);
+  .part-link.test .badge{
+    position:absolute;
+    top:8px;right:10px;
+    background:linear-gradient(135deg,var(--green),#22c55e);
+    color:#fff;
+    font-size:10px;
+    font-weight:800;
+    padding:3px 9px;
+    border-radius:10px;
+    letter-spacing:.3px;
+    box-shadow:0 3px 10px rgba(22,163,74,.3);
   }
-  .empty-state .emoji{
-    font-size:48px;
-    display:block;
-    margin-bottom:12px;
-    opacity:.5;
+  .part-link.draft .badge-soon{
+    position:absolute;
+    top:8px;right:10px;
+    background:#e7e5e4;
+    color:#57534e;
+    font-size:10px;
+    font-weight:800;
+    padding:3px 9px;
+    border-radius:10px;
   }
 
   /* FOOTER */
@@ -345,9 +513,86 @@ MathJax = {
 
   <div class="page-intro">
     <h2>Выберите урок</h2>
-    <p>Нажмите на урок, чтобы увидеть его части: актуализация, основной урок и проверка.</p>
+    <p>Учитель может дать прямую ссылку на любой раздел — просто скопируйте её из блока «Быстрый доступ» ниже.</p>
   </div>
 
+  <!-- ============================================================
+       БЫСТРЫЙ ДОСТУП — прямые ссылки на каждый раздел
+       ============================================================ -->
+  <div class="quick-access">
+    <p class="quick-hint">🖱 Нажмите правой кнопкой на нужную ссылку → «Копировать ссылку» → отправьте детям.</p>
+
+    <!-- Урок 1 -->
+    <div class="quick-lesson">
+      <div class="quick-lesson-title">
+        <span class="num">1</span>
+        Преобразование рациональных выражений · Урок 2
+      </div>
+      <div class="quick-links">
+        <a class="quick-link" href="urok1-aktualizaciya.html">
+          <span class="ico">💡</span> Актуализация
+        </a>
+        <a class="quick-link" href="urok1-osnovnoy.html">
+          <span class="ico">📝</span> Основной урок
+        </a>
+        <a class="quick-link" href="urok1-zakreplenie.html">
+          <span class="ico">🎯</span> Проверь себя
+        </a>
+      </div>
+    </div>
+
+    <!-- Урок 2 -->
+    <div class="quick-lesson">
+      <div class="quick-lesson-title">
+        <span class="num">2</span>
+        Преобразование рациональных выражений · Урок 3
+      </div>
+      <div class="quick-links">
+        <a class="quick-link" href="urok2-aktualizaciya.html">
+          <span class="ico">💡</span> Актуализация
+        </a>
+        <a class="quick-link" href="urok2-osnovnoy.html">
+          <span class="ico">📝</span> Основной урок
+        </a>
+        <a class="quick-link test" href="urok2-proverochnaya.html">
+          <span class="ico">🏆</span> Проверочная работа
+        </a>
+      </div>
+    </div>
+
+    <!-- Урок 3 — заготовка -->
+    <div class="quick-lesson draft">
+      <div class="quick-lesson-title">
+        <span class="num">3</span>
+        Функция $y = \dfrac{k}{x}$ и её график · Урок 1
+        <span class="soon">скоро</span>
+      </div>
+      <div class="quick-links">
+        <span class="quick-link disabled"><span class="ico">💡</span> Актуализация</span>
+        <span class="quick-link disabled"><span class="ico">📝</span> Основной урок</span>
+        <span class="quick-link disabled"><span class="ico">🎯</span> Проверь себя</span>
+      </div>
+    </div>
+
+    <!-- Урок 4 — заготовка -->
+    <div class="quick-lesson draft">
+      <div class="quick-lesson-title">
+        <span class="num">4</span>
+        Функция $y = \dfrac{k}{x}$ и её график · Урок 2
+        <span class="soon">скоро</span>
+      </div>
+      <div class="quick-links">
+        <span class="quick-link disabled"><span class="ico">💡</span> Актуализация</span>
+        <span class="quick-link disabled"><span class="ico">📝</span> Основной урок</span>
+        <span class="quick-link disabled"><span class="ico">🏆</span> Проверочная</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============================================================
+       СПИСОК УРОКОВ С РАСКРЫТИЕМ
+       ============================================================ -->
   <div class="section-title">
     <h3>8 класс · Алгебра</h3>
     <div class="line"></div>
@@ -355,61 +600,50 @@ MathJax = {
 
   <div class="lessons-list">
 
-    <!-- ======================================================
-         УРОК 1. Преобразование рациональных выражений
-         ====================================================== -->
+    <!-- УРОК 1 -->
     <div class="lesson-card" data-lesson="1">
       <div class="lesson-header" onclick="toggleLesson(this)">
         <div class="lesson-num">1</div>
         <div class="lesson-info">
-          <h4>Преобразование дробно-рациональных выражений</h4>
+          <h4>Преобразование рациональных выражений</h4>
           <p>Урок 2 · Закрепление · 3 части</p>
         </div>
         <div class="lesson-toggle">▾</div>
       </div>
       <div class="lesson-parts">
         <div class="lesson-parts-inner">
-
-          <a class="part-link" href="aktualizaciya.html">
+          <a class="part-link" href="urok1-aktualizaciya.html">
             <div class="part-icon">💡</div>
             <div class="part-info">
               <h5>Актуализация</h5>
-              <p>Формулы, пары, ОДЗ, общие множители</p>
+              <p>Формулы, ОДЗ, общие множители</p>
             </div>
           </a>
-
-          <a class="part-link" href="osnovnoy-urok.html">
+          <a class="part-link" href="urok1-osnovnoy.html">
             <div class="part-icon">📝</div>
             <div class="part-info">
               <h5>Основной урок</h5>
-              <p>4 задания по 6 примеров с полем для решения</p>
+              <p>Задания с полем для решения</p>
             </div>
           </a>
-
-          <a class="part-link" href="zakreplenie.html">
+          <a class="part-link" href="urok1-zakreplenie.html">
             <div class="part-icon">🎯</div>
             <div class="part-info">
               <h5>Проверь себя</h5>
-              <p>Координаты точек и графики функций</p>
+              <p>Интерактив в конце урока</p>
             </div>
           </a>
-
         </div>
       </div>
     </div>
 
-    <!-- ======================================================
-         ШАБЛОН ДЛЯ СЛЕДУЮЩЕГО УРОКА
-         Раскомментируйте и поменяйте содержимое,
-         когда будете готовить новый урок.
-         ====================================================== -->
-    <!--
+    <!-- УРОК 2 -->
     <div class="lesson-card" data-lesson="2">
       <div class="lesson-header" onclick="toggleLesson(this)">
         <div class="lesson-num">2</div>
         <div class="lesson-info">
-          <h4>Название следующего урока</h4>
-          <p>Урок 1 · Изучение нового · 3 части</p>
+          <h4>Преобразование рациональных выражений</h4>
+          <p>Урок 3 · Проверочная работа · 3 части</p>
         </div>
         <div class="lesson-toggle">▾</div>
       </div>
@@ -419,27 +653,107 @@ MathJax = {
             <div class="part-icon">💡</div>
             <div class="part-info">
               <h5>Актуализация</h5>
-              <p>Описание</p>
+              <p>Формулы, ОДЗ, общие множители</p>
             </div>
           </a>
           <a class="part-link" href="urok2-osnovnoy.html">
             <div class="part-icon">📝</div>
             <div class="part-info">
               <h5>Основной урок</h5>
-              <p>Описание</p>
+              <p>Сокращение, приведение, действия</p>
             </div>
           </a>
-          <a class="part-link" href="urok2-zakreplenie.html">
-            <div class="part-icon">🎯</div>
+          <a class="part-link test" href="urok2-proverochnaya.html">
+            <span class="badge">20 мин</span>
+            <div class="part-icon">🏆</div>
             <div class="part-info">
-              <h5>Проверь себя</h5>
-              <p>Описание</p>
+              <h5>Проверочная работа</h5>
+              <p>4 задания · с выбором уровня</p>
             </div>
           </a>
         </div>
       </div>
     </div>
-    -->
+
+    <!-- УРОК 3 — заготовка -->
+    <div class="lesson-card draft" data-lesson="3">
+      <div class="lesson-header" onclick="toggleLesson(this)">
+        <div class="lesson-num">3</div>
+        <div class="lesson-info">
+          <h4>Функция <span class="formula">$y = \dfrac{k}{x}$</span> и её график</h4>
+          <p>Урок 1 · Изучение нового · в разработке</p>
+        </div>
+        <div class="lesson-toggle">▾</div>
+      </div>
+      <div class="lesson-parts">
+        <div class="lesson-parts-inner">
+          <div class="part-link draft">
+            <span class="badge-soon">скоро</span>
+            <div class="part-icon">💡</div>
+            <div class="part-info">
+              <h5>Актуализация</h5>
+              <p>Файл появится позже</p>
+            </div>
+          </div>
+          <div class="part-link draft">
+            <span class="badge-soon">скоро</span>
+            <div class="part-icon">📝</div>
+            <div class="part-info">
+              <h5>Основной урок</h5>
+              <p>Файл появится позже</p>
+            </div>
+          </div>
+          <div class="part-link draft">
+            <span class="badge-soon">скоро</span>
+            <div class="part-icon">🎯</div>
+            <div class="part-info">
+              <h5>Проверь себя</h5>
+              <p>Файл появится позже</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- УРОК 4 — заготовка -->
+    <div class="lesson-card draft" data-lesson="4">
+      <div class="lesson-header" onclick="toggleLesson(this)">
+        <div class="lesson-num">4</div>
+        <div class="lesson-info">
+          <h4>Функция <span class="formula">$y = \dfrac{k}{x}$</span> и её график</h4>
+          <p>Урок 2 · Закрепление и проверочная · в разработке</p>
+        </div>
+        <div class="lesson-toggle">▾</div>
+      </div>
+      <div class="lesson-parts">
+        <div class="lesson-parts-inner">
+          <div class="part-link draft">
+            <span class="badge-soon">скоро</span>
+            <div class="part-icon">💡</div>
+            <div class="part-info">
+              <h5>Актуализация</h5>
+              <p>Файл появится позже</p>
+            </div>
+          </div>
+          <div class="part-link draft">
+            <span class="badge-soon">скоро</span>
+            <div class="part-icon">📝</div>
+            <div class="part-info">
+              <h5>Основной урок</h5>
+              <p>Файл появится позже</p>
+            </div>
+          </div>
+          <div class="part-link draft">
+            <span class="badge-soon">скоро</span>
+            <div class="part-icon">🏆</div>
+            <div class="part-info">
+              <h5>Проверочная работа</h5>
+              <p>Файл появится позже</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
   </div>
 
@@ -450,30 +764,20 @@ MathJax = {
 </footer>
 
 <script>
-/* ============================================================
-   РАСКРЫТИЕ / СКРЫТИЕ КАРТОЧКИ УРОКА
-   ============================================================ */
+/* Раскрытие / скрытие карточки урока */
 function toggleLesson(header){
   const card = header.closest('.lesson-card');
   const wasOpen = card.classList.contains('open');
-
-  // закрыть все остальные
   document.querySelectorAll('.lesson-card.open').forEach(c => {
     if(c !== card) c.classList.remove('open');
   });
-
-  // переключить текущую
   card.classList.toggle('open', !wasOpen);
 }
 
-/* ============================================================
-   АВТОРАСКРЫТИЕ ПЕРВОГО УРОКА ПРИ ЗАГРУЗКЕ
-   ============================================================ */
+/* Автораскрытие первого урока */
 window.addEventListener('load', () => {
   const first = document.querySelector('.lesson-card');
-  if(first) {
-    setTimeout(() => first.classList.add('open'), 300);
-  }
+  if(first) setTimeout(() => first.classList.add('open'), 300);
 });
 </script>
 
