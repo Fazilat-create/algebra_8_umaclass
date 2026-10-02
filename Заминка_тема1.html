@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Заминка · Функция и координаты точек</title>
+<script>
+MathJax = {
+  tex: {inlineMath: [['$','$'],['\\(','\\)']]},
+  svg: {fontCache: 'global'}
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root{
+    --primary:#4f46e5;
+    --primary-dark:#4338ca;
+    --primary-light:#eef2ff;
+    --accent:#f59e0b;
+    --accent-dark:#d97706;
+    --accent-light:#fef3c7;
+    --ok:#10b981;
+    --ok-light:#d1fae5;
+    --err:#ef4444;
+    --err-light:#fee2e2;
+    --bg:#f8fafc;
+    --card:#fff;
+    --text:#1e293b;
+    --muted:#64748b;
+    --border:#e2e8f0;
+  }
+  *{box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    background:linear-gradient(135deg,#eef2ff 0%,#fef3c7 100%);
+    min-height:100vh;color:var(--text);
+    display:flex;flex-direction:column;
+  }
+
+  /* ============ HEADER ============ */
+  header{
+    padding:14px 28px;
+    display:flex;justify-content:space-between;align-items:center;
+    background:rgba(255,255,255,.7);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .header-title{
+    font-size:15px;font-weight:800;
+    color:var(--primary-dark);
+    letter-spacing:.3px;
+  }
+  .header-title span{
+    color:var(--muted);font-weight:600;margin-left:8px;
+  }
+  .progress-pills{
+    display:flex;gap:8px;align-items:center;
+  }
+  .progress-pill{
+    width:34px;height:34px;border-radius:50%;
+    background:#fff;border:2px solid var(--border);
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:800;color:var(--muted);
+    transition:.3s;cursor:pointer;
+  }
+  .progress-pill:hover{border-color:var(--primary);color:var(--primary);}
+  .progress-pill.active{
+    background:linear-gradient(135deg,var(--primary),#8b5cf6);
+    color:#fff;border-color:transparent;
+    transform:scale(1.1);
+    box-shadow:0 4px 14px rgba(79,70,229,.35);
+  }
+  .progress-pill.done{
+    background:var(--ok-light);color:var(--ok);
+    border-color:var(--ok);
+  }
+
+  /* ============ MAIN ============ */
+  main{
+    flex:1;padding:28px 20px 120px;
+    display:flex;justify-content:center;
+  }
+  .slide{
+    display:none;
+    background:var(--card);border-radius:22px;
+    padding:32px 40px;
+    box-shadow:0 14px 50px rgba(15,23,42,.1);
+    border:1px solid var(--border);
+    width:100%;max-width:1200px;
+    animation:fade .4s ease;
+  }
+  .slide.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
+
+  .slide-tag{
+    display:inline-block;
+    background:var(--accent-light);color:var(--accent-dark);
+    padding:5px 14px;border-radius:20px;
+    font-size:13px;font-weight:700;margin-bottom:14px;
+    border:1px solid rgba(245,158,11,.25);
+  }
+  .slide h2{
+    font-size:26px;margin:0 0 6px;color:var(--text);font-weight:800;
+    letter-spacing:-.3px;
+  }
+  .slide .subtitle{
+    color:var(--muted);font-size:15px;margin:0 0 22px;
+  }
+
+  /* ============ СЛАЙД 1. ГРАФИК + ТОЧКИ ============ */
+  .graph-wrap{
+    display:grid;
+    grid-template-columns:1.1fr 1fr;
+    gap:28px;
+    align-items:start;
+  }
+  @media (max-width:900px){.graph-wrap{grid-template-columns:1fr;}}
+
+  .graph-box{
+    background:#fff;
+    border-radius:16px;
+    padding:14px;
+    border:2px solid var(--border);
+  }
+  .graph-box svg{
+    width:100%;height:auto;display:block;
+    border-radius:10px;
+    background:#fafbff;
+  }
+
+  /* ============ СПИСОК ТОЧЕК ============ */
+  .points-panel h3{
+    font-size:14px;color:var(--primary-dark);
+    text-transform:uppercase;letter-spacing:.5px;
+    font-weight:800;margin:0 0 14px;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .points-panel h3 .counter{
+    background:var(--primary-light);
+    color:var(--primary-dark);
+    padding:3px 10px;border-radius:10px;
+    font-size:12px;font-weight:800;
+  }
+
+  .points-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  .point-row{
+    display:flex;align-items:center;gap:8px;
+    background:#f8fafc;
+    border:2px solid var(--border);
+    border-radius:10px;
+    padding:8px 10px;
+    transition:.2s;
+  }
+  .point-row.correct{
+    background:var(--ok-light);
+    border-color:var(--ok);
+  }
+  .point-row.wrong{
+    background:var(--err-light);
+    border-color:var(--err);
+    animation:shake .4s;
+  }
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-6px);}
+    75%{transform:translateX(6px);}
+  }
+  .point-row .point-label{
+    font-weight:800;font-size:16px;
+    min-width:24px;text-align:center;
+    color:var(--primary-dark);
+  }
+  .point-row .point-label.color-A{color:#ef4444;}
+  .point-row .point-label.color-B{color:#3b82f6;}
+  .point-row .point-label.color-C{color:#10b981;}
+  .point-row .point-label.color-D{color:#f59e0b;}
+  .point-row .point-label.color-E{color:#8b5cf6;}
+  .point-row .point-label.color-F{color:#ec4899;}
+  .point-row .point-label.color-G{color:#14b8a6;}
+  .point-row .point-label.color-H{color:#f97316;}
+
+  .point-row .inputs{
+    display:flex;align-items:center;gap:4px;flex:1;
+    justify-content:center;
+  }
+  .point-row input{
+    width:44px;padding:6px 4px;
+    border:2px solid var(--border);
+    border-radius:8px;
+    font-size:14px;font-family:inherit;
+    text-align:center;font-weight:700;
+    transition:.2s;
+  }
+  .point-row input:focus{
+    outline:none;border-color:var(--primary);
+    box-shadow:0 0 0 3px rgba(79,70,229,.12);
+  }
+  .point-row.correct input{
+    background:transparent;border-color:var(--ok);color:#065f46;
+  }
+  .point-row.wrong input{
+    background:transparent;border-color:var(--err);color:#991b1b;
+  }
+  .point-row .paren{
+    font-size:14px;font-weight:700;color:var(--muted);
+  }
+
+  .check-all-btn{
+    width:100%;margin-top:16px;
+    padding:13px 22px;border:none;border-radius:12px;
+    background:linear-gradient(135deg,var(--primary),#8b5cf6);
+    color:#fff;font-size:15px;font-weight:700;
+    cursor:pointer;transition:.2s;
+    box-shadow:0 6px 18px rgba(79,70,229,.3);
+  }
+  .check-all-btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(79,70,229,.4);}
+
+  .result-banner{
+    margin-top:14px;
+    padding:12px 18px;border-radius:10px;
+    font-size:15px;font-weight:700;
+    display:none;
+  }
+  .result-banner.show{display:block;animation:fadeIn .3s ease;}
+  .result-banner.ok{background:var(--ok-light);color:#065f46;border-left:4px solid var(--ok);}
+  .result-banner.partial{background:var(--accent-light);color:#92400e;border-left:4px solid var(--accent);}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:none;}}
+
+  /* ============ СЛАЙД 2-3. ПРОВЕРКА ТОЧЕК ============ */
+  .func-card{
+    background:linear-gradient(135deg,#fff,#f8fafc);
+    border-left:5px solid var(--accent);
+    border-radius:14px;
+    padding:18px 24px;
+    margin:14px 0 22px;
+    display:flex;align-items:center;gap:16px;
+    flex-wrap:wrap;
+  }
+  .func-card .label{
+    font-size:14px;font-weight:800;
+    color:var(--accent-dark);
+    text-transform:uppercase;letter-spacing:.5px;
+  }
+  .func-card .formula{
+    font-size:24px;font-weight:700;
+    color:var(--text);
+  }
+  .func-card .note{
+    font-size:13px;color:var(--muted);
+    margin-left:auto;
+    font-style:italic;
+  }
+
+  .points-check-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:14px;
+  }
+  .point-check-card{
+    background:#fff;
+    border:2px solid var(--border);
+    border-radius:14px;
+    padding:16px 18px;
+    transition:.2s;
+  }
+  .point-check-card:hover{border-color:var(--primary);}
+  .point-check-card.correct{
+    background:var(--ok-light);border-color:var(--ok);
+  }
+  .point-check-card.wrong{
+    background:var(--err-light);border-color:var(--err);
+    animation:shake .4s;
+  }
+
+  .point-check-card .point-name{
+    font-size:17px;font-weight:800;
+    margin-bottom:10px;
+    color:var(--primary-dark);
+  }
+  .point-check-card.correct .point-name{color:#065f46;}
+  .point-check-card.wrong .point-name{color:#991b1b;}
+
+  .point-check-card .check-options{
+    display:flex;gap:8px;
+  }
+  .point-check-card .check-options button{
+    flex:1;padding:10px 12px;
+    border:2px solid var(--border);
+    background:#fff;border-radius:10px;
+    font-size:14px;font-weight:700;
+    cursor:pointer;transition:.2s;
+    color:var(--text);
+  }
+  .point-check-card .check-options button:hover:not(:disabled){
+    border-color:var(--primary);background:var(--primary-light);
+    color:var(--primary-dark);
+  }
+  .point-check-card .check-options button.yes{
+    border-color:rgba(16,185,129,.4);color:#065f46;
+  }
+  .point-check-card .check-options button.yes:hover{
+    background:var(--ok-light);border-color:var(--ok);
+  }
+  .point-check-card .check-options button.no{
+    border-color:rgba(239,68,68,.4);color:#991b1b;
+  }
+  .point-check-card .check-options button.no:hover{
+    background:var(--err-light);border-color:var(--err);
+  }
+  .point-check-card .check-options button.selected-correct{
+    background:var(--ok);color:#fff;border-color:var(--ok);
+  }
+  .point-check-card .check-options button.selected-wrong{
+    background:var(--err);color:#fff;border-color:var(--err);
+  }
+  .point-check-card .check-options button:disabled{
+    opacity:.5;cursor:not-allowed;
+  }
+  .point-check-card .explanation{
+    margin-top:12px;padding:10px 14px;
+    background:rgba(255,255,255,.7);
+    border-radius:8px;
+    font-size:13px;line-height:1.6;
+    color:var(--text);
+    display:none;
+  }
+  .point-check-card .explanation.show{display:block;animation:fadeIn .3s ease;}
+  .point-check-card .explanation b{color:var(--primary-dark);}
+
+  .rule-strip{
+    background:var(--primary-light);
+    border-left:5px solid var(--primary);
+    border-radius:10px;
+    padding:14px 20px;margin-top:22px;
+    font-size:15px;
+  }
+  .rule-strip b{color:var(--primary-dark);}
+
+  /* ============ NAVIGATION ============ */
+  nav{
+    position:fixed;bottom:0;left:0;right:0;
+    padding:16px 28px;
+    background:rgba(255,255,255,.85);
+    backdrop-filter:blur(10px);
+    border-top:1px solid var(--border);
+    display:flex;justify-content:space-between;align-items:center;gap:14px;
+    z-index:100;
+  }
+  nav button{
+    padding:13px 28px;border:none;border-radius:12px;
+    font-size:15px;font-weight:700;cursor:pointer;
+    transition:.2s;
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  nav .nav-prev{
+    background:#fff;color:var(--primary);
+    border:2px solid var(--primary);
+  }
+  nav .nav-prev:hover:not(:disabled){background:var(--primary-light);}
+  nav .nav-next{
+    background:linear-gradient(135deg,var(--primary),#8b5cf6);
+    color:#fff;
+    box-shadow:0 4px 14px rgba(79,70,229,.35);
+  }
+  nav .nav-next:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 20px rgba(79,70,229,.45);}
+  nav button:disabled{opacity:.4;cursor:not-allowed;transform:none !important;box-shadow:none !important;}
+  nav .nav-info{
+    font-size:14px;font-weight:700;color:var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-title">Заминка <span>· Функция и координаты точек</span></div>
+  <div class="progress-pills">
+    <div class="progress-pill active" data-slide="0">1</div>
+    <div class="progress-pill" data-slide="1">2</div>
+    <div class="progress-pill" data-slide="2">3</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- =========================================================
+       СЛАЙД 1. КООРДИНАТЫ 8 ТОЧЕК
+       ========================================================= -->
+  <section class="slide active">
+    <span class="slide-tag">Задание 1 · 3 мин</span>
+    <h2>Определи координаты точек</h2>
+    <p class="subtitle">На графике отмечены 8 точек. Запиши координаты каждой точки в поля. Когда заполнишь все — нажми «Проверить».</p>
+
+    <div class="graph-wrap">
+
+      <!-- ГРАФИК -->
+      <div class="graph-box">
+        <svg viewBox="0 0 440 440" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse">
+              <path d="M 44 0 L 0 0 0 44" fill="none" stroke="#dbeafe" stroke-width="1"/>
+            </pattern>
+            <pattern id="grid-small" width="8.8" height="8.8" patternUnits="userSpaceOnUse">
+              <path d="M 8.8 0 L 0 0 0 8.8" fill="none" stroke="#eff6ff" stroke-width="1"/>
+            </pattern>
+          </defs>
+          <rect width="440" height="440" fill="url(#grid-small)"/>
+          <rect width="440" height="440" fill="url(#grid)"/>
+
+          <!-- Оси -->
+          <line x1="0" y1="220" x2="440" y2="220" stroke="#334155" stroke-width="2"/>
+          <line x1="220" y1="0" x2="220" y2="440" stroke="#334155" stroke-width="2"/>
+
+          <!-- Стрелки -->
+          <polygon points="435,220 425,215 425,225" fill="#334155"/>
+          <polygon points="220,5 215,15 225,15" fill="#334155"/>
+
+          <!-- Подписи осей -->
+          <text x="425" y="240" font-size="15" fill="#334155" font-weight="bold">x</text>
+          <text x="230" y="14" font-size="15" fill="#334155" font-weight="bold">y</text>
+          <text x="204" y="238" font-size="13" fill="#64748b">0</text>
+
+          <!-- Деления x -->
+          <text x="260" y="238" font-size="12" fill="#64748b">1</text>
+          <text x="304" y="238" font-size="12" fill="#64748b">2</text>
+          <text x="348" y="238" font-size="12" fill="#64748b">3</text>
+          <text x="392" y="238" font-size="12" fill="#64748b">4</text>
+          <text x="172" y="238" font-size="12" fill="#64748b">−1</text>
+          <text x="128" y="238" font-size="12" fill="#64748b">−2</text>
+          <text x="84" y="238" font-size="12" fill="#64748b">−3</text>
+
+          <!-- Деления y -->
+          <text x="228" y="178" font-size="12" fill="#64748b">1</text>
+          <text x="228" y="134" font-size="12" fill="#64748b">2</text>
+          <text x="228" y="90" font-size="12" fill="#64748b">3</text>
+          <text x="228" y="46" font-size="12" fill="#64748b">4</text>
+          <text x="228" y="264" font-size="12" fill="#64748b">−1</text>
+          <text x="228" y="308" font-size="12" fill="#64748b">−2</text>
+          <text x="228" y="352" font-size="12" fill="#64748b">−3</text>
+
+          <!-- ===== ТОЧКИ ===== -->
+
+          <!-- A (3; 2) -->
+          <circle cx="352" cy="132" r="8" fill="#ef4444" stroke="#fff" stroke-width="2"/>
+          <text x="364" y="124" font-size="17" fill="#ef4444" font-weight="bold">A</text>
+
+          <!-- B (-2; -1) -->
+          <circle cx="132" cy="264" r="8" fill="#3b82f6" stroke="#fff" stroke-width="2"/>
+          <text x="110" y="256" font-size="17" fill="#3b82f6" font-weight="bold">B</text>
+
+          <!-- C (0; 3) -->
+          <circle cx="220" cy="88" r="8" fill="#10b981" stroke="#fff" stroke-width="2"/>
+          <text x="230" y="80" font-size="17" fill="#10b981" font-weight="bold">C</text>
+
+          <!-- D (-1; 2) -->
+          <circle cx="176" cy="132" r="8" fill="#f59e0b" stroke="#fff" stroke-width="2"/>
+          <text x="152" y="124" font-size="17" fill="#f59e0b" font-weight="bold">D</text>
+
+          <!-- E (2; -2) -->
+          <circle cx="308" cy="308" r="8" fill="#8b5cf6" stroke="#fff" stroke-width="2"/>
+          <text x="320" y="324" font-size="17" fill="#8b5cf6" font-weight="bold">E</text>
+
+          <!-- F (-3; 0) -->
+          <circle cx="88" cy="220" r="8" fill="#ec4899" stroke="#fff" stroke-width="2"/>
+          <text x="66" y="212" font-size="17" fill="#ec4899" font-weight="bold">F</text>
+
+          <!-- G (1; 0) -->
+          <circle cx="264" cy="220" r="8" fill="#14b8a6" stroke="#fff" stroke-width="2"/>
+          <text x="252" y="204" font-size="17" fill="#14b8a6" font-weight="bold">G</text>
+
+          <!-- H (-2; 1) -->
+          <circle cx="132" cy="176" r="8" fill="#f97316" stroke="#fff" stroke-width="2"/>
+          <text x="108" y="168" font-size="17" fill="#f97316" font-weight="bold">H</text>
+
+        </svg>
+      </div>
+
+      <!-- СПИСОК ТОЧЕК -->
+      <div class="points-panel">
+        <h3>
+          <span>Запиши координаты</span>
+          <span class="counter" id="pointsCounter">0 / 8</span>
+        </h3>
+
+        <div class="points-grid" id="pointsGrid">
+
+          <div class="point-row" data-point="A" data-x="3" data-y="2">
+            <span class="point-label color-A">A</span>
+            <div class="inputs">
+              <span class="paren">(</span>
+              <input type="number" data-field="x">
+              <span class="paren">;</span>
+              <input type="number" data-field="y">
+              <span class="paren">)</span>
+            </div>
+          </div>
+
+          <div class="point-row" data-point="B" data-x="-2" data-y="-1">
+            <span class="point-label color-B">B</span>
+            <div class="inputs">
+              <span class="paren">(</span>
+              <input type="number" data-field="x">
+              <span class="paren">;</span>
+              <input type="number" data-field="y">
+              <span class="paren">)</span>
+            </div>
+          </div>
+
+          <div class="point-row" data-point="C" data-x="0" data-y="3">
+            <span class="point-label color-C">C</span>
+            <div class="inputs">
+              <span class="paren">(</span>
+              <input type="number" data-field="x">
+              <span class="paren">;</span>
+              <input type="number" data-field="y">
+              <span class="paren">)</span>
+            </div>
+          </div>
+
+          <div class="point-row" data-point="D" data-x="-1" data-y="2">
+            <span class="point-label color-D">D</span>
+            <div class="inputs">
+              <span class="paren">(</span>
+              <input type="number" data-field="x">
+              <span class="paren">;</span>
+              <input type="number" data-field="y">
+              <span class="paren">)</span>
+            </div>
+          </div>
+
+          <div class="point-row" data-point="E" data-x="2" data-y="-2">
+            <span class="point-label color-E">E</span>
+            <div class="inputs">
+              <span class="paren">(</span>
+              <input type="number" data-field="x">
+              <span class="paren">;</span>
+              <input type="number" data-field="y">
+              <span class="paren">)</span>
+            </div>
+          </div>
+
+          <div class="point-row" data-point="F" data-x="-3" data-y="0">
+            <span class="point-label color-F">F</span>
+            <div class="inputs">
+              <span class="paren">(</span>
+              <input type="number" data-field="x">
+              <span class="paren">;</span>
+              <input type="number" data-field="y">
+              <span class="paren">)</span>
+            </div>
+          </div>
+
+          <div class="point-row" data-point="G" data-x="1" data-y="0">
+            <span class="point-label color-G">G</span>
+            <div class="inputs">
+              <span class="paren">(</span>
+              <input type="number" data-field="x">
+              <span class="paren">;</span>
+              <input type="number" data-field="y">
+              <span class="paren">)</span>
+            </div>
+          </div>
+
+          <div class="point-row" data-point="H" data-x="-2" data-y="1">
+            <span class="point-label color-H">H</span>
+            <div class="inputs">
+              <span class="paren">(</span>
+              <input type="number" data-field="x">
+              <span class="paren">;</span>
+              <input type="number" data-field="y">
+              <span class="paren">)</span>
+            </div>
+          </div>
+
+        </div>
+
+        <button class="check-all-btn" onclick="checkAllPoints()">✓ Проверить все</button>
+        <div class="result-banner" id="pointsResult"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================================
+       СЛАЙД 2. ЛИНЕЙНАЯ ФУНКЦИЯ
+       ========================================================= -->
+  <section class="slide">
+    <span class="slide-tag">Задание 2 · 3 мин</span>
+    <h2>Принадлежит ли точка графику функции?</h2>
+    <p class="subtitle">Для каждой точки выбери «Да» или «Нет». Подставь x в формулу и сравни с y.</p>
+
+    <div class="func-card">
+      <span class="label">Функция:</span>
+      <span class="formula">$y = 2x - 3$</span>
+      <span class="note">Подсказка: подставь x в формулу и проверь, получится ли y.</span>
+    </div>
+
+    <div class="points-check-grid" id="linearChecks">
+
+      <div class="point-check-card" data-correct="yes">
+        <div class="point-name">$M(2;\ 1)$</div>
+        <div class="check-options">
+          <button class="yes" onclick="checkPointBtn(this, 'yes')">Да</button>
+          <button class="no" onclick="checkPointBtn(this, 'no')">Нет</button>
+        </div>
+        <div class="explanation">
+          <b>Проверка:</b> $y = 2 \cdot 2 - 3 = 1$. Совпадает с $y = 1$. <b>Принадлежит.</b>
+        </div>
+      </div>
+
+      <div class="point-check-card" data-correct="yes">
+        <div class="point-name">$N(0;\ -3)$</div>
+        <div class="check-options">
+          <button class="yes" onclick="checkPointBtn(this, 'yes')">Да</button>
+          <button class="no" onclick="checkPointBtn(this, 'no')">Нет</button>
+        </div>
+        <div class="explanation">
+          <b>Проверка:</b> $y = 2 \cdot 0 - 3 = -3$. Совпадает с $y = -3$. <b>Принадлежит.</b>
+        </div>
+      </div>
+
+      <div class="point-check-card" data-correct="no">
+        <div class="point-name">$K(1;\ 2)$</div>
+        <div class="check-options">
+          <button class="yes" onclick="checkPointBtn(this, 'yes')">Да</button>
+          <button class="no" onclick="checkPointBtn(this, 'no')">Нет</button>
+        </div>
+        <div class="explanation">
+          <b>Проверка:</b> $y = 2 \cdot 1 - 3 = -1 \neq 2$. <b>Не принадлежит.</b>
+        </div>
+      </div>
+
+      <div class="point-check-card" data-correct="yes">
+        <div class="point-name">$P(-1;\ -5)$</div>
+        <div class="check-options">
+          <button class="yes" onclick="checkPointBtn(this, 'yes')">Да</button>
+          <button class="no" onclick="checkPointBtn(this, 'no')">Нет</button>
+        </div>
+        <div class="explanation">
+          <b>Проверка:</b> $y = 2 \cdot (-1) - 3 = -5$. Совпадает с $y = -5$. <b>Принадлежит.</b>
+        </div>
+      </div>
+
+      <div class="point-check-card" data-correct="yes">
+        <div class="point-name">$Q(3;\ 3)$</div>
+        <div class="check-options">
+          <button class="yes" onclick="checkPointBtn(this, 'yes')">Да</button>
+          <button class="no" onclick="checkPointBtn(this, 'no')">Нет</button>
+        </div>
+        <div class="explanation">
+          <b>Проверка:</b> $y = 2 \cdot 3 - 3 = 3$. Совпадает с $y = 3$. <b>Принадлежит.</b>
+        </div>
+      </div>
+
+      <div class="point-check-card" data-correct="no">
+        <div class="point-name">$R(-2;\ -6)$</div>
+        <div class="check-options">
+          <button class="yes" onclick="checkPointBtn(this, 'yes')">Да</button>
+          <button class="no" onclick="checkPointBtn(this, 'no')">Нет</button>
+        </div>
+        <div class="explanation">
+          <b>Проверка:</b> $y = 2 \cdot (-2) - 3 = -7 \neq -6$. <b>Не принадлежит.</b>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="rule-strip">
+      <b>Алгоритм:</b> подставь $x$ из координат точки в формулу функции. Если получилось то же $y$ — точка принадлежит графику.
+    </div>
+  </section>
+
+  <!-- =========================================================
+       СЛАЙД 3. ДРОБНО-РАЦИОНАЛЬНАЯ ФУНКЦИЯ
+       ========================================================= -->
+  <section class="slide">
+    <span class="slide-tag">Задание 3 · 4 мин</span>
+    <h2>Принадлежит ли точка графику дробно-рациональной функции?</h2>
+    <p class="subtitle">Подставь $x$ в формулу. Помни про ОДЗ: знаменатель не должен быть равен нулю.</p>
+
+    <div class="func-card">
+      <span class="label">Функция:</span>
+      <span class="formula">$y = \dfrac{6}{x-2}$</span>
+      <span class="note">ОДЗ: $x \neq 2$</span>
+    </div>
+
+    <div class="points-check-grid" id="rationalChecks">
+
+      <!-- A(3; 6) → да -->
+      <div class="point-check-card" data-correct="yes">
+        <div class="point-name">$A(3;\ 6)$</div>
+        <div class="check-options">
+          <button class="yes" onclick="checkPointBtn(this, 'yes')">Да</button>
+          <button class="no" onclick="checkPointBtn(this, 'no')">Нет</button>
+        </div>
+        <div class="explanation">
+          <b>Проверка:</b> $y = \dfrac{6}{3-2} = \dfrac{6}{1} = 6$. Совпадает. <b>Принадлежит.</b>
+        </div>
+      </div>
+
+      <!-- B(0; -3) → да -->
+      <div class="point-check-card" data-correct="yes">
+        <div class="point-name">$B(0;\ -3)$</div>
+        <div class="check-options">
+          <button class="yes" onclick="checkPointBtn(this, 'yes')">Да</button>
+          <button class="no" onclick="checkPointBtn(this, 'no')">Нет</button>
+        </div>
+        <div class="explanation">
+          <b>Проверка:</b> $y = \dfrac{6}{0-2} = \dfrac{6}{-2} = -3$. Совпадает. <b>Принадлежит.</b>
+        </div>
+      </div>
+
+      <!-- C(2; 0) → нет, x = 2 не входит в ОДЗ -->
+      <div class="point-check-card" data-correct="no">
+        <div class="point-name">$C(2;\ 0)$</div>
+        <div class="check-options">
+          <button class="yes" onclick="checkPointBtn(this, 'yes')">Да</button>
+          <button class="no" onclick="checkPointBtn(this, 'no')">Нет</button>
+        </div>
+        <div class="explanation">
+          <b>Проверка:</b> $x = 2$ не входит в ОДЗ — знаменатель обращается в нуль. <b>Не принадлежит.</b>
+        </div>
+      </div>
+
+      <!-- D(5; 2) → да -->
+      <div class="point-check-card" data-correct="yes">
+        <div class="point-name">$D(5;\ 2)$</div>
+        <div class="check-options">
+          <button class="yes" onclick="checkPointBtn(this, 'yes')">Да</button>
+          <button class="no" onclick="checkPointBtn(this, 'no')">Нет</button>
+        </div>
+        <div class="explanation">
+          <b>Проверка:</b> $y = \dfrac{6}{5-2} = \dfrac{6}{3} = 2$. Совпадает. <b>Принадлежит.</b>
+        </div>
+      </div>
+
+      <!-- E(-1; -2) → да -->
+      <div class="point-check-card" data-correct="yes">
+        <div class="point-name">$E(-1;\ -2)$</div>
+        <div class="check-options">
+          <button class="yes" onclick="checkPointBtn(this, 'yes')">Да</button>
+          <button class="no" onclick="checkPointBtn(this, 'no')">Нет</button>
+        </div>
+        <div class="explanation">
+          <b>Проверка:</b> $y = \dfrac{6}{-1-2} = \dfrac{6}{-3} = -2$. Совпадает. <b>Принадлежит.</b>
+        </div>
+      </div>
+
+      <!-- F(4; 4) → нет -->
+      <div class="point-check-card" data-correct="no">
+        <div class="point-name">$F(4;\ 4)$</div>
+        <div class="check-options">
+          <button class="yes" onclick="checkPointBtn(this, 'yes')">Да</button>
+          <button class="no" onclick="checkPointBtn(this, 'no')">Нет</button>
+        </div>
+        <div class="explanation">
+          <b>Проверка:</b> $y = \dfrac{6}{4-2} = \dfrac{6}{2} = 3 \neq 4$. <b>Не принадлежит.</b>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="rule-strip">
+      <b>Важно:</b> для дробно-рациональной функции сначала проверь ОДЗ. Если $x$ обращает знаменатель в нуль — точка точно не принадлежит графику.
+    </div>
+  </section>
+
+</main>
+
+<nav>
+  <button class="nav-prev" id="navPrev" onclick="changeSlide(-1)" disabled>← Назад</button>
+  <div class="nav-info" id="navInfo">Слайд 1 из 3</div>
+  <button class="nav-next" id="navNext" onclick="changeSlide(1)">Далее →</button>
+</nav>
+
+<script>
+/* ============================================================
+   НАВИГАЦИЯ
+   ============================================================ */
+let current = 0;
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+const prevBtn = document.getElementById('navPrev');
+const nextBtn = document.getElementById('navNext');
+const navInfo = document.getElementById('navInfo');
+const pills = document.querySelectorAll('.progress-pill');
+
+function showSlide(i){
+  slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+  pills.forEach((p, idx) => {
+    p.classList.toggle('active', idx === i);
+    p.classList.toggle('done', idx < i);
+  });
+  prevBtn.disabled = i === 0;
+  nextBtn.disabled = i === total - 1;
+  navInfo.textContent = `Слайд ${i + 1} из ${total}`;
+  window.scrollTo({top:0, behavior:'smooth'});
+  renderMath();
+}
+
+function changeSlide(dir){
+  current = Math.min(Math.max(current + dir, 0), total - 1);
+  showSlide(current);
+}
+
+pills.forEach((p, idx) => {
+  p.addEventListener('click', () => {
+    current = idx;
+    showSlide(current);
+  });
+});
+
+/* ============================================================
+   MATHJAX
+   ============================================================ */
+function renderMath(){
+  if(window.MathJax && MathJax.typesetPromise){
+    MathJax.typesetPromise().catch(err => console.log('MathJax error:', err));
+  }
+}
+
+/* ============================================================
+   СЛАЙД 1. ПРОВЕРКА 8 ТОЧЕК
+   ============================================================ */
+function updatePointsCounter(){
+  const rows = document.querySelectorAll('#pointsGrid .point-row');
+  let filled = 0;
+  rows.forEach(row => {
+    const x = row.querySelector('[data-field="x"]').value.trim();
+    const y = row.querySelector('[data-field="y"]').value.trim();
+    if(x !== '' && y !== '') filled++;
+  });
+  document.getElementById('pointsCounter').textContent = `${filled} / 8`;
+}
+
+document.querySelectorAll('#pointsGrid .point-row input').forEach(inp => {
+  inp.addEventListener('input', updatePointsCounter);
+});
+
+function checkAllPoints(){
+  const rows = document.querySelectorAll('#pointsGrid .point-row');
+  let correctCount = 0;
+  let filledCount = 0;
+
+  rows.forEach(row => {
+    const xInput = row.querySelector('[data-field="x"]');
+    const yInput = row.querySelector('[data-field="y"]');
+    const x = xInput.value.trim();
+    const y = yInput.value.trim();
+
+    row.classList.remove('correct','wrong');
+
+    if(x === '' || y === ''){
+      return;
+    }
+    filledCount++;
+
+    const correctX = String(row.dataset.x);
+    const correctY = String(row.dataset.y);
+
+    if(x === correctX && y === correctY){
+      row.classList.add('correct');
+      correctCount++;
+    } else {
+      row.classList.add('wrong');
+    }
+  });
+
+  const res = document.getElementById('pointsResult');
+  res.classList.add('show');
+
+  if(filledCount === 0){
+    res.className = 'result-banner show partial';
+    res.textContent = '⚠️ Заполни хотя бы одну точку.';
+  } else if(correctCount === rows.length){
+    res.className = 'result-banner show ok';
+    res.textContent = `🎉 Отлично! Все ${rows.length} точек определены верно!`;
+  } else {
+    res.className = 'result-banner show partial';
+    res.textContent = `Правильно: ${correctCount} из ${rows.length}. Проверь красные точки — координаты определены неверно.`;
+  }
+}
+
+/* ============================================================
+   СЛАЙД 2-3. ПРОВЕРКА ТОЧЕК НА ГРАФИКЕ
+   ============================================================ */
+function checkPointBtn(btn, chosen){
+  const card = btn.closest('.point-check-card');
+  if(card.dataset.answered === 'true') return;
+
+  const correct = card.dataset.correct;
+  const allBtns = card.querySelectorAll('.check-options button');
+  const explanation = card.querySelector('.explanation');
+
+  card.dataset.answered = 'true';
+
+  if(chosen === correct){
+    btn.classList.add('selected-correct');
+    card.classList.add('correct');
+  } else {
+    btn.classList.add('selected-wrong');
+    allBtns.forEach(b => {
+      if(b.classList.contains(correct)){
+        b.classList.add('selected-correct');
+      }
+    });
+    card.classList.add('wrong');
+  }
+
+  allBtns.forEach(b => b.disabled = true);
+  explanation.classList.add('show');
+}
+
+/* ============================================================
+   ИНИЦИАЛИЗАЦИЯ
+   ============================================================ */
+window.addEventListener('load', () => {
+  showSlide(0);
+  updatePointsCounter();
+  renderMath();
+  setTimeout(renderMath, 500);
+  setTimeout(renderMath, 1500);
+});
+</script>
+
+</body>
+</html>
