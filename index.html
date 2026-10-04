@@ -40,7 +40,6 @@ MathJax = {
     overflow-x:hidden;
   }
 
-  /* Декоративные листочки */
   .bg-leaf{position:fixed;pointer-events:none;z-index:0;user-select:none;}
   .bg-leaf.l1{top:6%;left:3%;transform:rotate(-25deg);font-size:100px;opacity:.16;}
   .bg-leaf.l2{top:35%;right:4%;transform:rotate(35deg);font-size:140px;opacity:.12;}
@@ -51,7 +50,6 @@ MathJax = {
   .bg-leaf.l7{top:70%;left:2%;transform:rotate(60deg);font-size:75px;opacity:.12;}
   .bg-leaf.l8{top:5%;right:8%;transform:rotate(-60deg);font-size:95px;opacity:.14;}
 
-  /* HEADER */
   header{
     padding:20px 40px;
     display:flex;justify-content:space-between;align-items:center;
@@ -72,7 +70,6 @@ MathJax = {
   }
   .brand-text p{margin:2px 0 0;font-size:13px;color:var(--muted);}
 
-  /* MAIN */
   main{
     flex:1;
     max-width:1100px;
@@ -101,9 +98,7 @@ MathJax = {
     line-height:1.5;
   }
 
-  /* ============================================================
-     БЫСТРЫЙ ДОСТУП
-     ============================================================ */
+  /* БЫСТРЫЙ ДОСТУП */
   .quick-access{
     background:linear-gradient(135deg,#fff7ed,#ffedd5);
     border:2px solid var(--amber);
@@ -230,7 +225,6 @@ MathJax = {
     pointer-events:none;
   }
 
-  /* Секция «Уроки» */
   .section-title{
     display:flex;
     align-items:center;
@@ -250,9 +244,7 @@ MathJax = {
     background:linear-gradient(90deg, var(--border), transparent);
   }
 
-  /* ============================================================
-     КАРТОЧКИ УРОКОВ (как было)
-     ============================================================ */
+  /* КАРТОЧКИ УРОКОВ */
   .lessons-list{
     display:flex;
     flex-direction:column;
@@ -477,7 +469,6 @@ MathJax = {
     border-radius:10px;
   }
 
-  /* FOOTER */
   footer{
     text-align:center;
     padding:20px 40px;
@@ -517,7 +508,7 @@ MathJax = {
   </div>
 
   <!-- ============================================================
-       БЫСТРЫЙ ДОСТУП — прямые ссылки на каждый раздел
+       БЫСТРЫЙ ДОСТУП
        ============================================================ -->
   <div class="quick-access">
     <p class="quick-hint">🖱 Нажмите правой кнопкой на нужную ссылку → «Копировать ссылку» → отправьте детям.</p>
@@ -529,15 +520,9 @@ MathJax = {
         Преобразование рациональных выражений · Урок 2
       </div>
       <div class="quick-links">
-        <a class="quick-link" href="urok1-aktualizaciya.html">
-          <span class="ico">💡</span> Актуализация
-        </a>
-        <a class="quick-link" href="urok1-osnovnoy.html">
-          <span class="ico">📝</span> Основной урок
-        </a>
-        <a class="quick-link" href="urok1-zakreplenie.html">
-          <span class="ico">🎯</span> Проверь себя
-        </a>
+        <a class="quick-link" href="urok1-aktualizaciya.html"><span class="ico">💡</span> Актуализация</a>
+        <a class="quick-link" href="urok1-osnovnoy.html"><span class="ico">📝</span> Основной урок</a>
+        <a class="quick-link" href="urok1-zakreplenie.html"><span class="ico">🎯</span> Проверь себя</a>
       </div>
     </div>
 
@@ -548,29 +533,22 @@ MathJax = {
         Преобразование рациональных выражений · Урок 3
       </div>
       <div class="quick-links">
-        <a class="quick-link" href="urok2-aktualizaciya.html">
-          <span class="ico">💡</span> Актуализация
-        </a>
-        <a class="quick-link" href="urok2-osnovnoy.html">
-          <span class="ico">📝</span> Основной урок
-        </a>
-        <a class="quick-link test" href="urok2-proverochnaya.html">
-          <span class="ico">🏆</span> Проверочная работа
-        </a>
+        <a class="quick-link" href="urok2-aktualizaciya.html"><span class="ico">💡</span> Актуализация</a>
+        <a class="quick-link" href="urok2-osnovnoy.html"><span class="ico">📝</span> Основной урок</a>
+        <a class="quick-link test" href="urok2-proverochnaya.html"><span class="ico">🏆</span> Проверочная работа</a>
       </div>
     </div>
 
-    <!-- Урок 3 — заготовка -->
-    <div class="quick-lesson draft">
+    <!-- Урок 3 — ГОТОВ -->
+    <div class="quick-lesson">
       <div class="quick-lesson-title">
         <span class="num">3</span>
         Функция $y = \dfrac{k}{x}$ и её график · Урок 1
-        <span class="soon">скоро</span>
       </div>
       <div class="quick-links">
-        <span class="quick-link disabled"><span class="ico">💡</span> Актуализация</span>
-        <span class="quick-link disabled"><span class="ico">📝</span> Основной урок</span>
-        <span class="quick-link disabled"><span class="ico">🎯</span> Проверь себя</span>
+        <a class="quick-link" href="urok3-aktualizaciya.html"><span class="ico">💡</span> Актуализация</a>
+        <a class="quick-link" href="urok3-osnovnoy.html"><span class="ico">📝</span> Основной урок</a>
+        <a class="quick-link" href="urok3-zakreplenie.html"><span class="ico">🎯</span> Проверь себя</a>
       </div>
     </div>
 
@@ -591,7 +569,7 @@ MathJax = {
   </div>
 
   <!-- ============================================================
-       СПИСОК УРОКОВ С РАСКРЫТИЕМ
+       СПИСОК УРОКОВ
        ============================================================ -->
   <div class="section-title">
     <h3>8 класс · Алгебра</h3>
@@ -614,24 +592,15 @@ MathJax = {
         <div class="lesson-parts-inner">
           <a class="part-link" href="urok1-aktualizaciya.html">
             <div class="part-icon">💡</div>
-            <div class="part-info">
-              <h5>Актуализация</h5>
-              <p>Формулы, ОДЗ, общие множители</p>
-            </div>
+            <div class="part-info"><h5>Актуализация</h5><p>Формулы, ОДЗ, общие множители</p></div>
           </a>
           <a class="part-link" href="urok1-osnovnoy.html">
             <div class="part-icon">📝</div>
-            <div class="part-info">
-              <h5>Основной урок</h5>
-              <p>Задания с полем для решения</p>
-            </div>
+            <div class="part-info"><h5>Основной урок</h5><p>Задания с полем для решения</p></div>
           </a>
           <a class="part-link" href="urok1-zakreplenie.html">
             <div class="part-icon">🎯</div>
-            <div class="part-info">
-              <h5>Проверь себя</h5>
-              <p>Интерактив в конце урока</p>
-            </div>
+            <div class="part-info"><h5>Проверь себя</h5><p>Интерактив в конце урока</p></div>
           </a>
         </div>
       </div>
@@ -651,66 +620,45 @@ MathJax = {
         <div class="lesson-parts-inner">
           <a class="part-link" href="urok2-aktualizaciya.html">
             <div class="part-icon">💡</div>
-            <div class="part-info">
-              <h5>Актуализация</h5>
-              <p>Формулы, ОДЗ, общие множители</p>
-            </div>
+            <div class="part-info"><h5>Актуализация</h5><p>Формулы, ОДЗ, общие множители</p></div>
           </a>
           <a class="part-link" href="urok2-osnovnoy.html">
             <div class="part-icon">📝</div>
-            <div class="part-info">
-              <h5>Основной урок</h5>
-              <p>Сокращение, приведение, действия</p>
-            </div>
+            <div class="part-info"><h5>Основной урок</h5><p>Сокращение, приведение, действия</p></div>
           </a>
           <a class="part-link test" href="urok2-proverochnaya.html">
             <span class="badge">20 мин</span>
             <div class="part-icon">🏆</div>
-            <div class="part-info">
-              <h5>Проверочная работа</h5>
-              <p>4 задания · с выбором уровня</p>
-            </div>
+            <div class="part-info"><h5>Проверочная работа</h5><p>4 задания · с выбором уровня</p></div>
           </a>
         </div>
       </div>
     </div>
 
-    <!-- УРОК 3 — заготовка -->
-    <div class="lesson-card draft" data-lesson="3">
+    <!-- УРОК 3 — ГОТОВ -->
+    <div class="lesson-card" data-lesson="3">
       <div class="lesson-header" onclick="toggleLesson(this)">
         <div class="lesson-num">3</div>
         <div class="lesson-info">
           <h4>Функция <span class="formula">$y = \dfrac{k}{x}$</span> и её график</h4>
-          <p>Урок 1 · Изучение нового · в разработке</p>
+          <p>Урок 1 · Изучение нового материала · 3 части</p>
         </div>
         <div class="lesson-toggle">▾</div>
       </div>
       <div class="lesson-parts">
         <div class="lesson-parts-inner">
-          <div class="part-link draft">
-            <span class="badge-soon">скоро</span>
+          <a class="part-link" href="urok3-aktualizaciya.html">
             <div class="part-icon">💡</div>
-            <div class="part-info">
-              <h5>Актуализация</h5>
-              <p>Файл появится позже</p>
-            </div>
-          </div>
-          <div class="part-link draft">
-            <span class="badge-soon">скоро</span>
+            <div class="part-info"><h5>Актуализация</h5><p>Линейная функция, четверти, деление на ноль</p></div>
+          </a>
+          <a class="part-link" href="urok3-osnovnoy.html">
             <div class="part-icon">📝</div>
-            <div class="part-info">
-              <h5>Основной урок</h5>
-              <p>Файл появится позже</p>
-            </div>
-          </div>
-          <div class="part-link draft">
-            <span class="badge-soon">скоро</span>
+            <div class="part-info"><h5>Основной урок</h5><p>От обратной пропорциональности к гиперболе</p></div>
+          </a>
+          <a class="part-link" href="urok3-zakreplenie.html">
             <div class="part-icon">🎯</div>
-            <div class="part-info">
-              <h5>Проверь себя</h5>
-              <p>Файл появится позже</p>
-            </div>
-          </div>
+            <div class="part-info"><h5>Проверь себя</h5><p>Верю/не верю, знак k, найди k</p></div>
+          </a>
         </div>
       </div>
     </div>
@@ -730,26 +678,17 @@ MathJax = {
           <div class="part-link draft">
             <span class="badge-soon">скоро</span>
             <div class="part-icon">💡</div>
-            <div class="part-info">
-              <h5>Актуализация</h5>
-              <p>Файл появится позже</p>
-            </div>
+            <div class="part-info"><h5>Актуализация</h5><p>Файл появится позже</p></div>
           </div>
           <div class="part-link draft">
             <span class="badge-soon">скоро</span>
             <div class="part-icon">📝</div>
-            <div class="part-info">
-              <h5>Основной урок</h5>
-              <p>Файл появится позже</p>
-            </div>
+            <div class="part-info"><h5>Основной урок</h5><p>Файл появится позже</p></div>
           </div>
           <div class="part-link draft">
             <span class="badge-soon">скоро</span>
             <div class="part-icon">🏆</div>
-            <div class="part-info">
-              <h5>Проверочная работа</h5>
-              <p>Файл появится позже</p>
-            </div>
+            <div class="part-info"><h5>Проверочная работа</h5><p>Файл появится позже</p></div>
           </div>
         </div>
       </div>
@@ -764,7 +703,6 @@ MathJax = {
 </footer>
 
 <script>
-/* Раскрытие / скрытие карточки урока */
 function toggleLesson(header){
   const card = header.closest('.lesson-card');
   const wasOpen = card.classList.contains('open');
@@ -774,7 +712,6 @@ function toggleLesson(header){
   card.classList.toggle('open', !wasOpen);
 }
 
-/* Автораскрытие первого урока */
 window.addEventListener('load', () => {
   const first = document.querySelector('.lesson-card');
   if(first) setTimeout(() => first.classList.add('open'), 300);
