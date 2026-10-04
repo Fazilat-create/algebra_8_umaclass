@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Заминка · Функция y = k/x</title>
+<script>
+MathJax = {
+  tex: {inlineMath: [['$','$'],['\\(','\\)']]},
+  svg: {fontCache: 'global'}
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root{
+    --orange:#ea580c;--orange-dark:#c2410c;--orange-light:#ffedd5;
+    --amber:#f59e0b;--amber-dark:#d97706;--amber-light:#fef3c7;
+    --ok:#10b981;--ok-light:#d1fae5;--err:#ef4444;--err-light:#fee2e2;
+    --blue:#2563eb;--blue-dark:#1e40af;--blue-light:#dbeafe;
+    --green:#16a34a;--green-light:#dcfce7;
+    --pink:#ec4899;--pink-dark:#9f1239;--pink-light:#fce7f3;
+    --text:#1e293b;--muted:#78716c;--border:#fed7aa;
+  }
+  *{box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif;}
+  html,body{margin:0;padding:0;height:100%;overflow:hidden;}
+  body{
+    background:
+      radial-gradient(1400px 700px at 5% -5%, #ffedd5 0%, transparent 55%),
+      radial-gradient(1000px 600px at 100% 100%, #fef3c7 0%, transparent 55%),
+      #fffbf5;
+    color:var(--text);height:100vh;display:flex;flex-direction:column;position:relative;
+  }
+
+  .bg-leaf{position:fixed;pointer-events:none;z-index:0;user-select:none;}
+  .bg-leaf.l1{top:6%;left:3%;transform:rotate(-25deg);font-size:80px;opacity:.14;}
+  .bg-leaf.l2{top:35%;right:4%;transform:rotate(35deg);font-size:110px;opacity:.1;}
+  .bg-leaf.l3{bottom:10%;left:10%;transform:rotate(15deg);font-size:90px;opacity:.12;}
+  .bg-leaf.l4{bottom:5%;right:15%;transform:rotate(-45deg);font-size:70px;opacity:.13;}
+  .bg-leaf.l5{top:15%;right:35%;transform:rotate(-10deg);font-size:60px;opacity:.11;}
+  .bg-leaf.l6{bottom:40%;left:40%;transform:rotate(120deg);font-size:70px;opacity:.09;}
+  .bg-leaf.l7{top:70%;left:2%;transform:rotate(60deg);font-size:65px;opacity:.1;}
+  .bg-leaf.l8{top:5%;right:8%;transform:rotate(-60deg);font-size:80px;opacity:.12;}
+
+  header{
+    padding:8px 20px;display:flex;justify-content:space-between;align-items:center;
+    background:rgba(255,251,245,.85);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px;
+    position:relative;z-index:10;flex-shrink:0;
+  }
+  .header-title{font-size:12px;font-weight:800;color:var(--orange-dark);}
+  .header-title span{color:var(--muted);font-weight:600;margin-left:6px;}
+  .progress-pills{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+  .progress-pill{
+    height:26px;min-width:26px;padding:0 10px;border-radius:13px;
+    background:#fff;border:2px solid var(--border);
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:800;color:var(--muted);cursor:pointer;
+  }
+  .progress-pill:hover{border-color:var(--orange);color:var(--orange);}
+  .progress-pill.active{background:linear-gradient(135deg,var(--orange),var(--amber));color:#fff;border-color:transparent;}
+  .progress-pill.done{background:var(--ok-light);color:var(--ok);border-color:var(--ok);}
+
+  main{flex:1;padding:10px 16px 70px;display:flex;justify-content:center;position:relative;z-index:5;overflow:hidden;min-height:0;}
+  .slide{
+    display:none;background:#fffdf9;border-radius:18px;
+    padding:16px 26px;box-shadow:0 12px 40px rgba(234,88,12,.12);
+    border:1px solid var(--border);width:100%;max-width:1600px;
+    animation:fade .4s ease;position:relative;overflow:hidden;height:100%;flex-direction:column;
+  }
+  .slide.active{display:flex;}
+  @keyframes fade{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+  .slide::before{content:'';position:absolute;top:-50px;right:-50px;width:160px;height:160px;background:radial-gradient(circle,rgba(254,215,170,.5) 0%,transparent 70%);pointer-events:none;}
+  .slide::after{content:'🌿';position:absolute;bottom:-15px;right:20px;font-size:90px;opacity:.05;transform:rotate(-20deg);pointer-events:none;}
+
+  .slide-header{flex-shrink:0;margin-bottom:14px;position:relative;z-index:2;}
+  .slide-tag{
+    display:inline-block;background:var(--amber-light);color:var(--amber-dark);
+    padding:3px 10px;border-radius:14px;font-size:10px;font-weight:700;margin-bottom:4px;
+    border:1px solid rgba(245,158,11,.3);
+  }
+  .slide-tag.warm-tag{background:var(--blue-light);color:var(--blue-dark);border-color:#93c5fd;}
+  .slide-tag.final-tag{background:var(--green-light);color:#166534;border-color:#86efac;}
+  .slide h2{font-size:22px;margin:0 0 4px;color:var(--orange-dark);font-weight:800;letter-spacing:-.3px;}
+  .slide h2.blue{color:var(--blue-dark);}
+  .slide .subtitle{color:var(--muted);font-size:13px;margin:0;line-height:1.4;}
+
+  .content{flex:1;display:flex;flex-direction:column;gap:14px;position:relative;z-index:2;min-height:0;overflow:hidden;}
+  .content.center{align-items:center;justify-content:center;}
+
+  /* Общая сетка для карточек «верю/не верю» и разминки */
+  .belief-grid{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:14px;
+    flex:1;
+    min-height:0;
+  }
+  .belief-card{
+    background:#fff;
+    border:3px solid var(--border);
+    border-radius:14px;
+    padding:14px 18px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    transition:.25s;
+    position:relative;
+  }
+  .belief-card:hover{border-color:var(--orange);}
+
+  .belief-card .belief-icon{
+    width:60px;
+    height:60px;
+    border-radius:12px;
+    background:linear-gradient(135deg,#ffedd5,#fed7aa);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+    flex-shrink:0;
+  }
+
+  .belief-card .belief-text{
+    flex:1;
+    font-size:15px;
+    font-weight:600;
+    line-height:1.5;
+  }
+
+  .belief-card .belief-buttons{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    flex-shrink:0;
+  }
+
+  .belief-btn{
+    padding:8px 14px;
+    border:2px solid var(--border);
+    background:#fff;
+    border-radius:9px;
+    font-size:13px;
+    font-weight:800;
+    cursor:pointer;
+    transition:.2s;
+    color:var(--text);
+    white-space:nowrap;
+  }
+  .belief-btn.yes:hover:not(:disabled){background:var(--ok-light);border-color:var(--ok);color:#065f46;}
+  .belief-btn.no:hover:not(:disabled){background:var(--err-light);border-color:var(--err);color:#991b1b;}
+  .belief-btn.correct{background:var(--ok);color:#fff;border-color:var(--ok);}
+  .belief-btn.wrong{background:var(--err);color:#fff;border-color:var(--err);}
+  .belief-btn:disabled{opacity:.7;cursor:default;}
+
+  .belief-card.answered-correct{
+    background:linear-gradient(135deg,#f0fdf4,#fff);
+    border-color:var(--ok);
+  }
+  .belief-card.answered-wrong{
+    background:linear-gradient(135deg,#fef2f2,#fff);
+    border-color:var(--err);
+  }
+
+  /* Определи знак k */
+  .sign-grid{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:14px;
+    flex:1;
+    min-height:0;
+  }
+  @media (max-width:1000px){.sign-grid{grid-template-columns:repeat(2, 1fr);}}
+
+  .sign-card{
+    background:#fff;
+    border:3px solid var(--border);
+    border-radius:14px;
+    padding:12px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    transition:.25s;
+    min-height:0;
+  }
+  .sign-card:hover{border-color:var(--orange);}
+
+  .sign-card .sign-graph{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:0;
+  }
+  .sign-card .sign-graph svg{
+    width:100%;
+    height:100%;
+    max-height:280px;
+  }
+
+  .sign-card .sign-buttons{
+    display:flex;
+    gap:8px;
+    flex-shrink:0;
+  }
+  .sign-card .sign-buttons button{
+    flex:1;
+    padding:10px 8px;
+    border:2px solid var(--border);
+    background:#fff;
+    border-radius:10px;
+    font-size:16px;
+    font-weight:800;
+    cursor:pointer;
+    transition:.2s;
+  }
+  .sign-card .sign-buttons button.plus:hover:not(:disabled){background:#f0fdf4;border-color:#16a34a;color:#166534;}
+  .sign-card .sign-buttons button.minus:hover:not(:disabled){background:#fef2f2;border-color:#dc2626;color:#991b1b;}
+  .sign-card .sign-buttons button.correct{background:var(--ok);color:#fff;border-color:var(--ok);}
+  .sign-card .sign-buttons button.wrong{background:var(--err);color:#fff;border-color:var(--err);}
+  .sign-card .sign-buttons button:disabled{cursor:default;}
+  .sign-card.answered-correct{background:linear-gradient(135deg,#f0fdf4,#fff);border-color:var(--ok);}
+  .sign-card.answered-wrong{background:linear-gradient(135deg,#fef2f2,#fff);border-color:var(--err);}
+
+  /* Найди k */
+  .find-k-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:16px;
+    flex:1;
+    min-height:0;
+    align-content:center;
+  }
+  @media (max-width:1000px){.find-k-grid{grid-template-columns:1fr;}}
+
+  .find-k-card{
+    background:#fff;
+    border:3px solid var(--border);
+    border-radius:14px;
+    padding:20px 22px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    transition:.25s;
+    text-align:center;
+  }
+  .find-k-card:hover{border-color:var(--orange);}
+
+  .find-k-card .fk-point{
+    font-size:22px;
+    font-weight:800;
+    color:var(--orange-dark);
+  }
+  .find-k-card .fk-text{
+    font-size:13px;
+    color:var(--muted);
+    line-height:1.5;
+  }
+  .find-k-card .fk-input-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    font-size:18px;
+    font-weight:800;
+  }
+  .find-k-card .fk-input-row input{
+    width:70px;
+    padding:10px 6px;
+    border:2px solid var(--border);
+    border-radius:9px;
+    font-size:18px;
+    font-family:inherit;
+    text-align:center;
+    font-weight:800;
+    background:#fff;
+  }
+  .find-k-card .fk-input-row input:focus{
+    outline:none;
+    border-color:var(--orange);
+    box-shadow:0 0 0 3px rgba(234,88,12,.12);
+  }
+  .find-k-card .fk-input-row input.correct{background:var(--ok-light);border-color:var(--ok);color:#065f46;}
+  .find-k-card .fk-input-row input.wrong{background:var(--err-light);border-color:var(--err);color:#991b1b;}
+
+  .find-k-card.answered-correct{background:linear-gradient(135deg,#f0fdf4,#fff);border-color:var(--ok);}
+  .find-k-card.answered-wrong{background:linear-gradient(135deg,#fef2f2,#fff);border-color:var(--err);}
+
+  /* Финал */
+  .final-content{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:20px;
+    text-align:center;
+  }
+  .final-icon{
+    font-size:80px;
+    animation:wobble 2s infinite;
+  }
+  @keyframes wobble{
+    0%,100%{transform:rotate(-6deg);}
+    50%{transform:rotate(6deg);}
+  }
+  .final-title{
+    font-size:30px;
+    font-weight:800;
+    color:var(--orange-dark);
+    margin:0;
+    letter-spacing:-.4px;
+  }
+  .final-subtitle{
+    font-size:15px;
+    color:var(--muted);
+    margin:0;
+    max-width:800px;
+    line-height:1.6;
+  }
+
+  .memo-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:14px;
+    width:100%;
+    max-width:1000px;
+    margin-top:8px;
+  }
+  @media (max-width:800px){.memo-grid{grid-template-columns:1fr;}}
+
+  .memo-card{
+    background:linear-gradient(135deg,#fff7ed,#ffedd5);
+    border:2px solid var(--border);
+    border-radius:14px;
+    padding:14px 18px;
+    text-align:center;
+  }
+  .memo-card .memo-title{
+    font-size:12px;
+    font-weight:800;
+    color:var(--amber-dark);
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    margin-bottom:6px;
+  }
+  .memo-card .memo-text{
+    font-size:15px;
+    font-weight:700;
+    color:var(--text);
+    line-height:1.5;
+  }
+
+  nav{
+    position:fixed;bottom:0;left:0;right:0;padding:8px 20px;
+    background:rgba(255,251,245,.9);backdrop-filter:blur(10px);
+    border-top:1px solid var(--border);display:flex;justify-content:space-between;
+    align-items:center;gap:12px;z-index:100;
+  }
+  nav button{padding:8px 20px;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;}
+  nav .nav-prev{background:#fff;color:var(--orange);border:2px solid var(--orange);}
+  nav .nav-prev:hover:not(:disabled){background:var(--orange-light);}
+  nav .nav-next{background:linear-gradient(135deg,var(--orange),var(--amber));color:#fff;}
+  nav button:disabled{opacity:.4;cursor:not-allowed;}
+  nav .nav-info{font-size:12px;font-weight:700;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<span class="bg-leaf l1">🌿</span>
+<span class="bg-leaf l2">🍃</span>
+<span class="bg-leaf l3">🌱</span>
+<span class="bg-leaf l4">🌿</span>
+<span class="bg-leaf l5">🍃</span>
+<span class="bg-leaf l6">🌱</span>
+<span class="bg-leaf l7">🌿</span>
+<span class="bg-leaf l8">🍃</span>
+
+<header>
+  <div class="header-title">Заминка · урок 1 <span>· Функция y = k/x</span></div>
+  <div class="progress-pills">
+    <div class="progress-pill active" data-slide="0">1</div>
+    <div class="progress-pill" data-slide="1">2</div>
+    <div class="progress-pill" data-slide="2">3</div>
+    <div class="progress-pill" data-slide="3">4</div>
+    <div class="progress-pill" data-slide="4">5</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- СЛАЙД 1. РАЗМИНКА: ПРОЙДЕННОЕ -->
+  <section class="slide active">
+    <div class="slide-header">
+      <span class="slide-tag warm-tag">Разминка · вспомним</span>
+      <h2 class="blue">Что мы уже знаем?</h2>
+      <p class="subtitle">Вспомним линейную функцию, оси координат и четверти — это нам сегодня помогает.</p>
+    </div>
+    <div class="content">
+      <div class="belief-grid">
+
+        <div class="belief-card" data-answer="true">
+          <div class="belief-icon">📏</div>
+          <div class="belief-text">График функции $y = kx + b$ — это <b>прямая линия</b>.</div>
+          <div class="belief-buttons">
+            <button class="belief-btn yes" onclick="checkBelief(this, true)">Верно</button>
+            <button class="belief-btn no" onclick="checkBelief(this, false)">Неверно</button>
+          </div>
+        </div>
+
+        <div class="belief-card" data-answer="false">
+          <div class="belief-icon">📈</div>
+          <div class="belief-text">Если $k < 0$ в формуле $y = kx$, то прямая идёт <b>вверх</b>.</div>
+          <div class="belief-buttons">
+            <button class="belief-btn yes" onclick="checkBelief(this, true)">Верно</button>
+            <button class="belief-btn no" onclick="checkBelief(this, false)">Неверно</button>
+          </div>
+        </div>
+
+        <div class="belief-card" data-answer="true">
+          <div class="belief-icon">🎯</div>
+          <div class="belief-text">Точка $(2;\ -3)$ лежит в <b>IV четверти</b>.</div>
+          <div class="belief-buttons">
+            <button class="belief-btn yes" onclick="checkBelief(this, true)">Верно</button>
+            <button class="belief-btn no" onclick="checkBelief(this, false)">Неверно</button>
+          </div>
+        </div>
+
+        <div class="belief-card" data-answer="true">
+          <div class="belief-icon">✖️</div>
+          <div class="belief-text">Обе оси координат пересекаются в точке $(0;\ 0)$.</div>
+          <div class="belief-buttons">
+            <button class="belief-btn yes" onclick="checkBelief(this, true)">Верно</button>
+            <button class="belief-btn no" onclick="checkBelief(this, false)">Неверно</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- СЛАЙД 2. ВЕРЮ / НЕ ВЕРЮ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag">Лёгкая разминка</span>
+      <h2>Верю или не верю?</h2>
+      <p class="subtitle">Теперь — про гиперболу. Прочитай и выбери ответ. Проверка — сразу.</p>
+    </div>
+    <div class="content">
+      <div class="belief-grid">
+
+        <div class="belief-card" data-answer="true">
+          <div class="belief-icon">📉</div>
+          <div class="belief-text">График $y = -\dfrac{3}{x}$ расположен во <b>II и IV</b> четвертях.</div>
+          <div class="belief-buttons">
+            <button class="belief-btn yes" onclick="checkBelief(this, true)">Верно</button>
+            <button class="belief-btn no" onclick="checkBelief(this, false)">Неверно</button>
+          </div>
+        </div>
+
+        <div class="belief-card" data-answer="false">
+          <div class="belief-icon">🚫</div>
+          <div class="belief-text">График $y = \dfrac{5}{x}$ проходит через начало координат.</div>
+          <div class="belief-buttons">
+            <button class="belief-btn yes" onclick="checkBelief(this, true)">Верно</button>
+            <button class="belief-btn no" onclick="checkBelief(this, false)">Неверно</button>
+          </div>
+        </div>
+
+        <div class="belief-card" data-answer="true">
+          <div class="belief-icon">0️⃣</div>
+          <div class="belief-text">При $x = 0$ функция $y = \dfrac{k}{x}$ не определена.</div>
+          <div class="belief-buttons">
+            <button class="belief-btn yes" onclick="checkBelief(this, true)">Верно</button>
+            <button class="belief-btn no" onclick="checkBelief(this, false)">Неверно</button>
+          </div>
+        </div>
+
+        <div class="belief-card" data-answer="false">
+          <div class="belief-icon">↔️</div>
+          <div class="belief-text">Чем больше $|k|$, тем ближе ветви к осям координат.</div>
+          <div class="belief-buttons">
+            <button class="belief-btn yes" onclick="checkBelief(this, true)">Верно</button>
+            <button class="belief-btn no" onclick="checkBelief(this, false)">Неверно</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- СЛАЙД 3. ОПРЕДЕЛИ ЗНАК K -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag">Внимание на форму</span>
+      <h2>Определи знак $k$</h2>
+      <p class="subtitle">Ветви в I и III четвертях? Нажми «+». Ветви во II и IV? Нажми «−».</p>
+    </div>
+    <div class="content">
+      <div class="sign-grid">
+
+        <!-- + : y = 1/x -->
+        <div class="sign-card" data-answer="plus">
+          <div class="sign-graph">
+            <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <pattern id="sg1" width="20" height="20" patternUnits="userSpaceOnUse">
+                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#fbbf24" stroke-width="0.6"/>
+                </pattern>
+              </defs>
+              <rect width="240" height="240" fill="url(#sg1)"/>
+              <line x1="0" y1="120" x2="240" y2="120" stroke="#334155" stroke-width="1.5"/>
+              <line x1="120" y1="0" x2="120" y2="240" stroke="#334155" stroke-width="1.5"/>
+              <text x="226" y="114" font-size="12" fill="#334155" font-weight="bold">x</text>
+              <text x="126" y="14" font-size="12" fill="#334155" font-weight="bold">y</text>
+              <path d="M 124 60 Q 128 90 140 100 Q 160 110 200 116 Q 230 118 240 119"
+                    fill="none" stroke="#ea580c" stroke-width="3" stroke-linecap="round"/>
+              <path d="M 116 180 Q 112 150 100 140 Q 80 130 40 124 Q 10 122 0 121"
+                    fill="none" stroke="#ea580c" stroke-width="3" stroke-linecap="round"/>
+              <text x="126" y="40" font-size="12" fill="#9f1239" font-weight="bold" opacity="0.55">I</text>
+              <text x="80" y="40" font-size="12" fill="#9f1239" font-weight="bold" opacity="0.55">II</text>
+              <text x="80" y="210" font-size="12" fill="#9f1239" font-weight="bold" opacity="0.55">III</text>
+              <text x="160" y="210" font-size="12" fill="#9f1239" font-weight="bold" opacity="0.55">IV</text>
+            </svg>
+          </div>
+          <div class="sign-buttons">
+            <button class="plus" onclick="checkSign(this, 'plus')">+</button>
+            <button class="minus" onclick="checkSign(this, 'minus')">−</button>
+          </div>
+        </div>
+
+        <!-- − : y = -1/x -->
+        <div class="sign-card" data-answer="minus">
+          <div class="sign-graph">
+            <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+              <rect width="240" height="240" fill="url(#sg1)"/>
+              <line x1="0" y1="120" x2="240" y2="120" stroke="#334155" stroke-width="1.5"/>
+              <line x1="120" y1="0" x2="120" y2="240" stroke="#334155" stroke-width="1.5"/>
+              <text x="226" y="114" font-size="12" fill="#334155" font-weight="bold">x</text>
+              <text x="126" y="14" font-size="12" fill="#334155" font-weight="bold">y</text>
+              <path d="M 124 180 Q 128 150 140 140 Q 160 130 200 124 Q 230 122 240 121"
+                    fill="none" stroke="#ea580c" stroke-width="3" stroke-linecap="round"/>
+              <path d="M 116 60 Q 112 90 100 100 Q 80 110 40 116 Q 10 118 0 119"
+                    fill="none" stroke="#ea580c" stroke-width="3" stroke-linecap="round"/>
+              <text x="126" y="40" font-size="12" fill="#9f1239" font-weight="bold" opacity="0.55">I</text>
+              <text x="80" y="40" font-size="12" fill="#9f1239" font-weight="bold" opacity="0.55">II</text>
+              <text x="80" y="210" font-size="12" fill="#9f1239" font-weight="bold" opacity="0.55">III</text>
+              <text x="160" y="210" font-size="12" fill="#9f1239" font-weight="bold" opacity="0.55">IV</text>
+            </svg>
+          </div>
+          <div class="sign-buttons">
+            <button class="plus" onclick="checkSign(this, 'plus')">+</button>
+            <button class="minus" onclick="checkSign(this, 'minus')">−</button>
+          </div>
+        </div>
+
+        <!-- + : y = 1/x (снова) -->
+        <div class="sign-card" data-answer="plus">
+          <div class="sign-graph">
+            <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+              <rect width="240" height="240" fill="url(#sg1)"/>
+              <line x1="0" y1="120" x2="240" y2="120" stroke="#334155" stroke-width="1.5"/>
+              <line x1="120" y1="0" x2="120" y2="240" stroke="#334155" stroke-width="1.5"/>
+              <text x="226" y="114" font-size="12" fill="#334155" font-weight="bold">x</text>
+              <text x="126" y="14" font-size="12" fill="#334155" font-weight="bold">y</text>
+              <path d="M 124 60 Q 128 90 140 100 Q 160 110 200 116 Q 230 118 240 119"
+                    fill="none" stroke="#ea580c" stroke-width="3" stroke-linecap="round"/>
+              <path d="M 116 180 Q 112 150 100 140 Q 80 130 40 124 Q 10 122 0 121"
+                    fill="none" stroke="#ea580c" stroke-width="3" stroke-linecap="round"/>
+              <text x="126" y="40" font-size="12" fill="#9f1239" font-weight="bold" opacity="0.55">I</text>
+              <text x="80" y="40" font-size="12" fill="#9f1239" font-weight="bold" opacity="0.55">II</text>
+              <text x="80" y="210" font-size="12" fill="#9f1239" font-weight="bold" opacity="0.55">III</text>
+              <text x="160" y="210" font-size="12" fill="#9f1239" font-weight="bold" opacity="0.55">IV</text>
+            </svg>
+          </div>
+          <div class="sign-buttons">
+            <button class="plus" onclick="checkSign(this, 'plus')">+</button>
+            <button class="minus" onclick="checkSign(this, 'minus')">−</button>
+          </div>
+        </div>
+
+        <!-- − : y = -1/x (снова) -->
+        <div class="sign-card" data-answer="minus">
+          <div class="sign-graph">
+            <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+              <rect width="240" height="240" fill="url(#sg1)"/>
+              <line x1="0" y1="120" x2="240" y2="120" stroke="#334155" stroke-width="1.5"/>
+              <line x1="120" y1="0" x2="120" y2="240" stroke="#334155" stroke-width="1.5"/>
+              <text x="226" y="114" font-size="12" fill="#334155" font-weight="bold">x</text>
+              <text x="126" y="14" font-size="12" fill="#334155" font-weight="bold">y</text>
+              <path d="M 124 180 Q 128 150 140 140 Q 160 130 200 124 Q 230 122 240 121"
+                    fill="none" stroke="#ea580c" stroke-width="3" stroke-linecap="round"/>
+              <path d="M 116 60 Q 112 90 100 100 Q 80 110 40 116 Q 10 118 0 119"
+                    fill="none" stroke="#ea580c" stroke-width="3" stroke-linecap="round"/>
+              <text x="126" y="40" font-size="12" fill="#9f1239" font-weight="bold" opacity="0.55">I</text>
+              <text x="80" y="40" font-size="12" fill="#9f1239" font-weight="bold" opacity="0.55">II</text>
+              <text x="80" y="210" font-size="12" fill="#9f1239" font-weight="bold" opacity="0.55">III</text>
+              <text x="160" y="210" font-size="12" fill="#9f1239" font-weight="bold" opacity="0.55">IV</text>
+            </svg>
+          </div>
+          <div class="sign-buttons">
+            <button class="plus" onclick="checkSign(this, 'plus')">+</button>
+            <button class="minus" onclick="checkSign(this, 'minus')">−</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- СЛАЙД 4. НАЙДИ K ПО ТОЧКЕ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag">Небольшой счёт</span>
+      <h2>Найди $k$ по точке</h2>
+      <p class="subtitle">Вспомни: $k = x \cdot y$. Введи число и нажми Enter.</p>
+    </div>
+    <div class="content">
+      <div class="find-k-grid">
+
+        <div class="find-k-card" data-answer="12">
+          <div class="fk-point">$(3;\ 4)$</div>
+          <div class="fk-text">График $y = \dfrac{k}{x}$ проходит через эту точку. Чему равен $k$?</div>
+          <div class="fk-input-row">$k =$ <input type="text" data-k="12" onchange="checkFindK(this)"></div>
+        </div>
+
+        <div class="find-k-card" data-answer="-10">
+          <div class="fk-point">$(2;\ -5)$</div>
+          <div class="fk-text">Найди $k$ для функции $y = \dfrac{k}{x}$, проходящей через точку.</div>
+          <div class="fk-input-row">$k =$ <input type="text" data-k="-10" onchange="checkFindK(this)"></div>
+        </div>
+
+        <div class="find-k-card" data-answer="-6">
+          <div class="fk-point">$(-2;\ 3)$</div>
+          <div class="fk-text">Найди $k$. Обрати внимание на знак.</div>
+          <div class="fk-input-row">$k =$ <input type="text" data-k="-6" onchange="checkFindK(this)"></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- СЛАЙД 5. ФИНАЛ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag final-tag">Готово</span>
+      <h2>Молодцы!</h2>
+      <p class="subtitle">Мы прошли первый урок по теме «Функция y = k/x».</p>
+    </div>
+    <div class="content">
+      <div class="final-content">
+        <div class="final-icon">🎉</div>
+        <h3 class="final-title">Что мы узнали сегодня</h3>
+        <p class="final-subtitle">Функция $y = \dfrac{k}{x}$ — это обратная пропорциональность. Её график — гипербола. А знак коэффициента $k$ подсказывает, где именно расположены ветви.</p>
+
+        <div class="memo-grid">
+          <div class="memo-card">
+            <div class="memo-title">Формула</div>
+            <div class="memo-text">$y = \dfrac{k}{x}, \quad k \neq 0$</div>
+          </div>
+          <div class="memo-card">
+            <div class="memo-title">Область определения</div>
+            <div class="memo-text">$x \neq 0$</div>
+          </div>
+          <div class="memo-card">
+            <div class="memo-title">График</div>
+            <div class="memo-text">Гипербола — две ветви</div>
+          </div>
+        </div>
+
+        <div class="memo-grid">
+          <div class="memo-card" style="background:linear-gradient(135deg,#f0fdf4,#fff);border-color:#86efac;">
+            <div class="memo-title" style="color:#166534;">$k > 0$</div>
+            <div class="memo-text" style="color:#166534;">Ветви в I и III четвертях</div>
+          </div>
+          <div class="memo-card" style="background:linear-gradient(135deg,#fef2f2,#fff);border-color:#fca5a5;">
+            <div class="memo-title" style="color:#991b1b;">$k < 0$</div>
+            <div class="memo-text" style="color:#991b1b;">Ветви во II и IV четвертях</div>
+          </div>
+          <div class="memo-card">
+            <div class="memo-title">$|k|$ влияет</div>
+            <div class="memo-text">На удалённость ветвей от центра</div>
+          </div>
+        </div>
+
+        <p class="final-subtitle" style="margin-top:14px;font-size:14px;">
+          На следующем уроке — исследуем, как меняется график при разных $k$.
+        </p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<nav>
+  <button class="nav-prev" id="navPrev" onclick="changeSlide(-1)" disabled>← Назад</button>
+  <div class="nav-info" id="navInfo">Слайд 1 из 5</div>
+  <button class="nav-next" id="navNext" onclick="changeSlide(1)">Далее →</button>
+</nav>
+
+<script>
+var current = 0;
+var slides = document.querySelectorAll('.slide');
+var total = slides.length;
+var prevBtn = document.getElementById('navPrev');
+var nextBtn = document.getElementById('navNext');
+var navInfo = document.getElementById('navInfo');
+var pills = document.querySelectorAll('.progress-pill');
+
+function showSlide(i){
+  slides.forEach(function(s, idx){ s.classList.toggle('active', idx === i); });
+  pills.forEach(function(p, idx){
+    p.classList.toggle('active', idx === i);
+    p.classList.toggle('done', idx < i);
+  });
+  prevBtn.disabled = (i === 0);
+  nextBtn.disabled = (i === total - 1);
+  navInfo.textContent = 'Слайд ' + (i + 1) + ' из ' + total;
+  renderMath();
+}
+
+function changeSlide(dir){
+  current = Math.min(Math.max(current + dir, 0), total - 1);
+  showSlide(current);
+}
+
+pills.forEach(function(p, idx){
+  p.addEventListener('click', function(){
+    current = idx;
+    showSlide(current);
+  });
+});
+
+function renderMath(){
+  if(window.MathJax && MathJax.typesetPromise){
+    MathJax.typesetPromise().catch(function(err){ console.log('MathJax error:', err); });
+  }
+}
+
+/* ВЕРЮ / НЕ ВЕРЮ */
+function checkBelief(btn, answer){
+  var card = btn.closest('.belief-card');
+  if(card.dataset.answered === 'true') return;
+  var correct = card.dataset.answer === 'true';
+  var allBtns = card.querySelectorAll('.belief-btn');
+  if(answer === correct){
+    btn.classList.add('correct');
+    card.classList.add('answered-correct');
+    card.dataset.answered = 'true';
+    allBtns.forEach(function(b){ b.disabled = true; });
+  } else {
+    btn.classList.add('wrong');
+    card.classList.add('answered-wrong');
+    setTimeout(function(){
+      btn.classList.remove('wrong');
+      card.classList.remove('answered-wrong');
+    }, 900);
+  }
+}
+
+/* ОПРЕДЕЛИ ЗНАК K */
+function checkSign(btn, answer){
+  var card = btn.closest('.sign-card');
+  if(card.dataset.answered === 'true') return;
+  var correct = card.dataset.answer;
+  var allBtns = card.querySelectorAll('.sign-buttons button');
+  if(answer === correct){
+    btn.classList.add('correct');
+    card.classList.add('answered-correct');
+    card.dataset.answered = 'true';
+    allBtns.forEach(function(b){ b.disabled = true; });
+  } else {
+    btn.classList.add('wrong');
+    card.classList.add('answered-wrong');
+    setTimeout(function(){
+      btn.classList.remove('wrong');
+      card.classList.remove('answered-wrong');
+    }, 900);
+  }
+}
+
+/* НАЙДИ K */
+function checkFindK(inp){
+  var card = inp.closest('.find-k-card');
+  if(card.dataset.answered === 'true') return;
+  var user = inp.value.trim().replace(',', '.').replace('−','-').replace(/\s+/g,'');
+  if(user === '') return;
+  var correct = inp.dataset.k;
+  inp.classList.remove('correct','wrong');
+  card.classList.remove('answered-correct','answered-wrong');
+  if(parseFloat(user) === parseFloat(correct)){
+    inp.classList.add('correct');
+    card.classList.add('answered-correct');
+    card.dataset.answered = 'true';
+  } else {
+    inp.classList.add('wrong');
+    card.classList.add('answered-wrong');
+    setTimeout(function(){
+      inp.classList.remove('wrong');
+      card.classList.remove('answered-wrong');
+    }, 1000);
+  }
+}
+
+document.querySelectorAll('.find-k-card input').forEach(function(inp){
+  inp.addEventListener('keydown', function(e){
+    if(e.key === 'Enter') inp.blur();
+  });
+});
+
+window.addEventListener('load', function(){
+  showSlide(0);
+  renderMath();
+  setTimeout(renderMath, 500);
+  setTimeout(renderMath, 1500);
+});
+</script>
+
+</body>
+</html>
