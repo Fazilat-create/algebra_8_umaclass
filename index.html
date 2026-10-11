@@ -121,7 +121,6 @@ MathJax = {
     border-radius:12px;
     box-shadow:0 2px 8px rgba(245,158,11,.2);
   }
-
   .quick-hint{
     font-size:12px;
     color:var(--amber-dark);
@@ -130,7 +129,6 @@ MathJax = {
     text-align:center;
     opacity:.85;
   }
-
   .quick-lesson{
     display:flex;
     flex-direction:column;
@@ -139,7 +137,7 @@ MathJax = {
     border-bottom:1px dashed rgba(245,158,11,.3);
   }
   .quick-lesson:last-child{border-bottom:none;}
-  .quick-lesson.draft{opacity:.5;}
+  .quick-lesson.draft{opacity:.55;}
 
   .quick-lesson-title{
     font-size:13px;
@@ -150,6 +148,7 @@ MathJax = {
     display:flex;
     align-items:center;
     gap:8px;
+    flex-wrap:wrap;
   }
   .quick-lesson-title .num{
     display:inline-flex;
@@ -181,7 +180,6 @@ MathJax = {
     flex-wrap:wrap;
     gap:8px;
   }
-
   .quick-link{
     display:inline-flex;
     align-items:center;
@@ -205,7 +203,6 @@ MathJax = {
     box-shadow:0 4px 12px rgba(234,88,12,.15);
   }
   .quick-link .ico{font-size:15px;}
-
   .quick-link.test{
     border-color:#86efac;
     background:#f0fdf4;
@@ -216,7 +213,6 @@ MathJax = {
     background:var(--green-light);
     box-shadow:0 4px 12px rgba(22,163,74,.2);
   }
-
   .quick-link.disabled{
     background:#fafaf9;
     border-style:dashed;
@@ -225,6 +221,7 @@ MathJax = {
     pointer-events:none;
   }
 
+  /* СПИСОК УРОКОВ */
   .section-title{
     display:flex;
     align-items:center;
@@ -244,7 +241,6 @@ MathJax = {
     background:linear-gradient(90deg, var(--border), transparent);
   }
 
-  /* КАРТОЧКИ УРОКОВ */
   .lessons-list{
     display:flex;
     flex-direction:column;
@@ -539,7 +535,7 @@ MathJax = {
       </div>
     </div>
 
-    <!-- Урок 3 — ГОТОВ -->
+    <!-- Урок 3 -->
     <div class="quick-lesson">
       <div class="quick-lesson-title">
         <span class="num">3</span>
@@ -552,24 +548,36 @@ MathJax = {
       </div>
     </div>
 
-    <!-- Урок 4 — заготовка -->
-    <div class="quick-lesson draft">
+    <!-- Урок 4 -->
+    <div class="quick-lesson">
       <div class="quick-lesson-title">
         <span class="num">4</span>
         Функция $y = \dfrac{k}{x}$ и её график · Урок 2
-        <span class="soon">скоро</span>
       </div>
       <div class="quick-links">
-        <span class="quick-link disabled"><span class="ico">💡</span> Актуализация</span>
-        <span class="quick-link disabled"><span class="ico">📝</span> Основной урок</span>
-        <span class="quick-link disabled"><span class="ico">🏆</span> Проверочная</span>
+        <a class="quick-link" href="urok4-aktualizaciya.html"><span class="ico">💡</span> Актуализация</a>
+        <a class="quick-link" href="urok4-osnovnoy.html"><span class="ico">📝</span> Основной урок</a>
+        <span class="quick-link disabled"><span class="ico">🎯</span> Проверь себя</span>
+      </div>
+    </div>
+
+    <!-- Урок 5 -->
+    <div class="quick-lesson">
+      <div class="quick-lesson-title">
+        <span class="num">5</span>
+        Квадратные корни · Урок 1
+      </div>
+      <div class="quick-links">
+        <a class="quick-link" href="urok5-aktualizaciya.html"><span class="ico">💡</span> Актуализация</a>
+        <a class="quick-link" href="urok5-osnovnoy.html"><span class="ico">📝</span> Основной урок</a>
+        <span class="quick-link disabled"><span class="ico">🎯</span> Проверь себя</span>
       </div>
     </div>
 
   </div>
 
   <!-- ============================================================
-       СПИСОК УРОКОВ
+       СПИСОК УРОКОВ С РАСКРЫТИЕМ
        ============================================================ -->
   <div class="section-title">
     <h3>8 класс · Алгебра</h3>
@@ -635,7 +643,7 @@ MathJax = {
       </div>
     </div>
 
-    <!-- УРОК 3 — ГОТОВ -->
+    <!-- УРОК 3 -->
     <div class="lesson-card" data-lesson="3">
       <div class="lesson-header" onclick="toggleLesson(this)">
         <div class="lesson-num">3</div>
@@ -663,33 +671,50 @@ MathJax = {
       </div>
     </div>
 
-    <!-- УРОК 4 — заготовка -->
-    <div class="lesson-card draft" data-lesson="4">
+    <!-- УРОК 4 -->
+    <div class="lesson-card" data-lesson="4">
       <div class="lesson-header" onclick="toggleLesson(this)">
         <div class="lesson-num">4</div>
         <div class="lesson-info">
           <h4>Функция <span class="formula">$y = \dfrac{k}{x}$</span> и её график</h4>
-          <p>Урок 2 · Закрепление и проверочная · в разработке</p>
+          <p>Урок 2 · Закрепление · 2 части</p>
         </div>
         <div class="lesson-toggle">▾</div>
       </div>
       <div class="lesson-parts">
         <div class="lesson-parts-inner">
-          <div class="part-link draft">
-            <span class="badge-soon">скоро</span>
+          <a class="part-link" href="urok4-aktualizaciya.html">
             <div class="part-icon">💡</div>
-            <div class="part-info"><h5>Актуализация</h5><p>Файл появится позже</p></div>
-          </div>
-          <div class="part-link draft">
-            <span class="badge-soon">скоро</span>
+            <div class="part-info"><h5>Актуализация</h5><p>Повторение перед новым материалом</p></div>
+          </a>
+          <a class="part-link" href="urok4-osnovnoy.html">
             <div class="part-icon">📝</div>
-            <div class="part-info"><h5>Основной урок</h5><p>Файл появится позже</p></div>
-          </div>
-          <div class="part-link draft">
-            <span class="badge-soon">скоро</span>
-            <div class="part-icon">🏆</div>
-            <div class="part-info"><h5>Проверочная работа</h5><p>Файл появится позже</p></div>
-          </div>
+            <div class="part-info"><h5>Основной урок</h5><p>Задания с полем для решения</p></div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- УРОК 5 -->
+    <div class="lesson-card" data-lesson="5">
+      <div class="lesson-header" onclick="toggleLesson(this)">
+        <div class="lesson-num">5</div>
+        <div class="lesson-info">
+          <h4>Квадратные корни. Арифметический квадратный корень</h4>
+          <p>Урок 1 · Изучение нового материала · 2 части</p>
+        </div>
+        <div class="lesson-toggle">▾</div>
+      </div>
+      <div class="lesson-parts">
+        <div class="lesson-parts-inner">
+          <a class="part-link" href="urok5-aktualizaciya.html">
+            <div class="part-icon">💡</div>
+            <div class="part-info"><h5>Актуализация</h5><p>Квадрат числа, обратные действия, множества</p></div>
+          </a>
+          <a class="part-link" href="urok5-osnovnoy.html">
+            <div class="part-icon">📝</div>
+            <div class="part-info"><h5>Основной урок</h5><p>Определение корня, примеры, практика</p></div>
+          </a>
         </div>
       </div>
     </div>
