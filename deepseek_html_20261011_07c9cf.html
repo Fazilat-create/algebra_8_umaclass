@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Основной урок · Действительные числа</title>
+<script>
+MathJax = {
+  tex: {inlineMath: [['$','$'],['\\(','\\)']]},
+  svg: {fontCache: 'global'}
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root{
+    --orange:#ea580c;--orange-dark:#c2410c;--orange-light:#ffedd5;
+    --amber:#f59e0b;--amber-dark:#d97706;--amber-light:#fef3c7;
+    --ok:#10b981;--ok-light:#d1fae5;--err:#ef4444;--err-light:#fee2e2;
+    --blue:#2563eb;--blue-dark:#1e40af;--blue-light:#dbeafe;
+    --green:#16a34a;--green-light:#dcfce7;
+    --pink:#ec4899;--pink-dark:#9f1239;--pink-light:#fce7f3;
+    --text:#1e293b;--muted:#78716c;--border:#fed7aa;
+  }
+  *{box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif;}
+  html,body{margin:0;padding:0;height:100%;overflow:hidden;}
+  body{
+    background:
+      radial-gradient(1400px 700px at 5% -5%, #ffedd5 0%, transparent 55%),
+      radial-gradient(1000px 600px at 100% 100%, #fef3c7 0%, transparent 55%),
+      #fffbf5;
+    color:var(--text);height:100vh;display:flex;flex-direction:column;position:relative;
+  }
+
+  .bg-leaf{position:fixed;pointer-events:none;z-index:0;user-select:none;}
+  .bg-leaf.l1{top:6%;left:3%;transform:rotate(-25deg);font-size:80px;opacity:.14;}
+  .bg-leaf.l2{top:35%;right:4%;transform:rotate(35deg);font-size:110px;opacity:.1;}
+  .bg-leaf.l3{bottom:10%;left:10%;transform:rotate(15deg);font-size:90px;opacity:.12;}
+  .bg-leaf.l4{bottom:5%;right:15%;transform:rotate(-45deg);font-size:70px;opacity:.13;}
+  .bg-leaf.l5{top:15%;right:35%;transform:rotate(-10deg);font-size:60px;opacity:.11;}
+  .bg-leaf.l6{bottom:40%;left:40%;transform:rotate(120deg);font-size:70px;opacity:.09;}
+  .bg-leaf.l7{top:70%;left:2%;transform:rotate(60deg);font-size:65px;opacity:.1;}
+  .bg-leaf.l8{top:5%;right:8%;transform:rotate(-60deg);font-size:80px;opacity:.12;}
+
+  header{
+    padding:8px 20px;display:flex;justify-content:space-between;align-items:center;
+    background:rgba(255,251,245,.85);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px;
+    position:relative;z-index:10;flex-shrink:0;
+  }
+  .header-title{font-size:12px;font-weight:800;color:var(--orange-dark);}
+  .header-title span{color:var(--muted);font-weight:600;margin-left:6px;}
+  .progress-pills{display:flex;gap:3px;align-items:center;flex-wrap:wrap;}
+  .progress-pill{
+    height:22px;min-width:22px;padding:0 7px;border-radius:11px;
+    background:#fff;border:2px solid var(--border);
+    display:flex;align-items:center;justify-content:center;
+    font-size:9px;font-weight:800;color:var(--muted);cursor:pointer;
+  }
+  .progress-pill:hover{border-color:var(--orange);color:var(--orange);}
+  .progress-pill.active{background:linear-gradient(135deg,var(--orange),var(--amber));color:#fff;border-color:transparent;}
+  .progress-pill.done{background:var(--ok-light);color:var(--ok);border-color:var(--ok);}
+  .progress-pill.theory{background:var(--blue-light);color:var(--blue-dark);border-color:#93c5fd;}
+  .progress-pill.theory.active{background:linear-gradient(135deg,var(--blue),#1d4ed8);color:#fff;border-color:transparent;}
+  .progress-pill.theory.done{background:#bfdbfe;color:var(--blue-dark);}
+
+  main{flex:1;padding:14px 20px 80px;display:flex;justify-content:center;position:relative;z-index:5;overflow:hidden;min-height:0;}
+  .slide{
+    display:none;background:#fffdf9;border-radius:18px;
+    padding:16px 26px;box-shadow:0 12px 40px rgba(234,88,12,.12);
+    border:1px solid var(--border);width:100%;max-width:1600px;
+    animation:fade .4s ease;position:relative;overflow:hidden;height:100%;flex-direction:column;
+  }
+  .slide.active{display:flex;}
+  @keyframes fade{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+  .slide::before{content:'';position:absolute;top:-50px;right:-50px;width:160px;height:160px;background:radial-gradient(circle,rgba(254,215,170,.5) 0%,transparent 70%);pointer-events:none;}
+  .slide::after{content:'🌿';position:absolute;bottom:-15px;right:20px;font-size:90px;opacity:.05;transform:rotate(-20deg);pointer-events:none;}
+
+  .slide-header{flex-shrink:0;margin-bottom:10px;position:relative;z-index:2;}
+  .slide-tag{
+    display:inline-block;background:var(--amber-light);color:var(--amber-dark);
+    padding:3px 10px;border-radius:14px;font-size:10px;font-weight:700;margin-bottom:4px;
+    border:1px solid rgba(245,158,11,.3);
+  }
+  .slide-tag.theory-tag{background:var(--blue-light);color:var(--blue-dark);border-color:#93c5fd;}
+  .slide-tag.result-tag{background:var(--green-light);color:#166534;border-color:#86efac;}
+  .slide h2{font-size:20px;margin:0 0 2px;color:var(--orange-dark);font-weight:800;letter-spacing:-.3px;}
+  .slide h2.blue{color:var(--blue-dark);}
+  .slide h2.green{color:#166534;}
+  .slide .subtitle{color:var(--muted);font-size:12px;margin:0;line-height:1.4;}
+
+  .content{flex:1;display:flex;flex-direction:column;gap:12px;position:relative;z-index:2;min-height:0;overflow:hidden;}
+  .content.center{align-items:center;justify-content:center;}
+
+  .theory-block{
+    background:#fff;border:2px solid var(--border);border-radius:12px;
+    padding:16px 22px;position:relative;
+  }
+  .theory-block h3{margin:0 0 10px;font-size:17px;color:var(--blue-dark);font-weight:800;}
+  .theory-block p{font-size:15px;line-height:1.7;margin:6px 0;}
+
+  .formula-highlight{
+    background:linear-gradient(135deg,#ffedd5,#fed7aa);
+    border:2px solid var(--orange);border-radius:12px;
+    padding:14px 22px;text-align:center;font-size:26px;
+    font-weight:700;color:var(--orange-dark);margin:8px 0;
+  }
+  .formula-highlight.blue{background:linear-gradient(135deg,#dbeafe,#bfdbfe);border-color:var(--blue);color:var(--blue-dark);}
+  .formula-highlight.pink{background:linear-gradient(135deg,#fce7f3,#fbcfe8);border-color:var(--pink);color:var(--pink-dark);}
+  .formula-highlight.big{font-size:32px;padding:18px 28px;}
+
+  .key-idea{
+    background:linear-gradient(135deg,#fef3c7,#fde68a);
+    border-left:5px solid var(--amber-dark);border-radius:12px;
+    padding:12px 18px;font-size:14px;line-height:1.6;margin:6px 0;
+  }
+  .key-idea b{color:var(--amber-dark);}
+  .key-idea.blue{background:linear-gradient(135deg,#dbeafe,#bfdbfe);border-left-color:var(--blue-dark);}
+  .key-idea.blue b{color:var(--blue-dark);}
+
+  .tasks-grid-4{
+    flex:1;display:grid;grid-template-columns:1fr 1fr;gap:12px;
+    grid-template-rows:1fr 1fr;min-height:0;
+  }
+  .task-card{
+    background:#fff;border:2px dashed var(--amber);border-radius:12px;
+    padding:12px 14px;display:flex;flex-direction:column;gap:8px;
+    position:relative;min-height:0;
+  }
+  .task-card::before{content:'✏️';position:absolute;top:6px;right:10px;font-size:11px;opacity:.4;}
+  .task-card .tc-head{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+  .task-card .tc-letter{
+    display:inline-flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,var(--orange),var(--amber));
+    color:#fff;font-weight:800;font-size:11px;
+    width:24px;height:24px;border-radius:7px;flex-shrink:0;
+  }
+  .task-card .tc-expr{
+    background:rgba(255,247,237,.95);border-radius:7px;
+    padding:6px 10px;font-size:15px;font-weight:600;
+    border:1px solid rgba(234,88,12,.15);flex:1;
+  }
+  .task-card .tc-work{flex:1;min-height:30px;}
+
+  .detect-grid{
+    flex:1;display:grid;grid-template-columns:1fr 1fr;
+    grid-template-rows:1fr 1fr;gap:12px;min-height:0;
+  }
+  .detect-card{
+    background:#fff;border:3px solid var(--border);border-radius:12px;
+    padding:14px 16px;display:flex;flex-direction:column;gap:10px;
+    transition:.25s;min-height:0;
+  }
+  .detect-card:hover{border-color:var(--orange);}
+  .detect-card .formula{font-size:22px;font-weight:800;text-align:center;color:var(--orange-dark);padding:6px 0;}
+  .detect-card .options{display:flex;flex-direction:column;gap:6px;}
+  .detect-card .opt{
+    padding:8px 12px;background:#fff;border:2px solid var(--border);
+    border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;
+    transition:.2s;text-align:center;
+  }
+  .detect-card .opt:hover:not(:disabled){background:var(--orange-light);border-color:var(--orange);}
+  .detect-card .opt.correct{background:var(--ok-light);border-color:var(--ok);color:#065f46;}
+  .detect-card .opt.wrong{background:var(--err-light);border-color:var(--err);color:#991b1b;}
+  .detect-card .opt:disabled{cursor:default;opacity:.75;}
+  .detect-card.answered-correct{background:linear-gradient(135deg,#f0fdf4,#fff);border-color:var(--ok);}
+  .detect-card.answered-wrong{background:linear-gradient(135deg,#fef2f2,#fff);border-color:var(--err);}
+
+  .euler-layout{
+    flex:1;display:grid;grid-template-columns:1.2fr 1fr;gap:24px;
+    align-items:center;min-height:0;
+  }
+  @media (max-width:1000px){.euler-layout{grid-template-columns:1fr;}}
+
+  .euler-diagram{
+    background:#fff;border:2px solid var(--border);border-radius:14px;
+    padding:16px;display:flex;align-items:center;justify-content:center;
+    min-height:0;height:100%;
+  }
+  .euler-diagram svg{width:100%;height:100%;max-height:100%;display:block;}
+
+  .euler-text{display:flex;flex-direction:column;gap:10px;}
+
+  /* СЛАЙД «ВЫЧИСЛИ И ЗАПОЛНИ» */
+  .calc-fill-layout{
+    flex:1;display:grid;grid-template-columns:1fr 1.15fr;gap:20px;
+    min-height:0;
+  }
+  @media (max-width:1100px){.calc-fill-layout{grid-template-columns:1fr;}}
+
+  .calc-fill-left, .calc-fill-right{
+    background:#fff;border:2px solid var(--border);border-radius:14px;
+    padding:16px 20px;display:flex;flex-direction:column;gap:10px;
+    min-height:0;overflow:hidden;
+  }
+
+  .mini-title{
+    font-size:13px;font-weight:800;color:var(--blue-dark);
+    text-transform:uppercase;letter-spacing:.4px;
+    margin:0 0 4px;flex-shrink:0;
+  }
+
+  .calc-item{
+    background:#fffdf9;border:1.5px solid var(--border);border-radius:10px;
+    padding:10px 12px;display:flex;align-items:center;gap:12px;
+    flex-shrink:0;
+  }
+  .calc-item .ci-word{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-width:120px;
+    padding:8px 14px;
+    background:linear-gradient(135deg,var(--orange),var(--amber));
+    color:#fff;
+    border-radius:10px;
+    font-size:14px;font-weight:800;
+    font-family:Georgia,serif;
+    cursor:pointer;
+    user-select:none;
+    transition:.2s;
+    box-shadow:0 3px 10px rgba(234,88,12,.25);
+    flex-shrink:0;
+  }
+  .calc-item .ci-word:hover{
+    transform:translateY(-2px);
+    box-shadow:0 6px 16px rgba(234,88,12,.4);
+  }
+  .calc-item .ci-word.selected{
+    transform:scale(1.05);
+    box-shadow:0 0 0 4px rgba(234,88,12,.3), 0 6px 18px rgba(234,88,12,.4);
+  }
+  .calc-item .ci-word.used{
+    opacity:.25;
+    pointer-events:none;
+    text-decoration:line-through;
+  }
+  .calc-item .ci-body{
+    flex:1;display:flex;align-items:center;gap:10px;
+    background:#fff;border-radius:8px;
+    padding:8px 14px;
+    border:1px solid var(--border);
+  }
+  .calc-item .ci-expr{font-size:16px;font-weight:600;}
+
+  .calc-hint{
+    background:linear-gradient(135deg,#fef3c7,#fde68a);
+    border-left:4px solid var(--amber-dark);border-radius:8px;
+    padding:8px 14px;font-size:12px;color:#92400e;line-height:1.5;
+    margin-top:auto;flex-shrink:0;
+  }
+
+  .fill-text-compact{
+    display:flex;flex-direction:column;gap:14px;
+    font-size:14px;line-height:2.4;
+    overflow:auto;padding-right:4px;min-height:0;
+  }
+  .fill-text-compact::-webkit-scrollbar{width:5px;}
+  .fill-text-compact::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+  .fill-text-compact p{margin:0;}
+  .fill-text-compact b{color:var(--blue-dark);}
+
+  .answer-badge{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-width:32px;padding:2px 8px;
+    background:linear-gradient(135deg,#ffedd5,#fed7aa);
+    border:2px solid var(--orange);
+    border-radius:6px;
+    font-weight:800;font-size:13px;color:var(--orange-dark);
+    margin:0 4px;vertical-align:middle;
+    font-family:Georgia,serif;
+  }
+
+  .inline-slot{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    vertical-align:middle;
+    margin:0 4px;
+  }
+  .inline-slot .slot-num{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-width:36px;
+    padding:2px 10px;
+    background:linear-gradient(135deg,#ffedd5,#fed7aa);
+    border:2px solid var(--orange);
+    border-radius:6px;
+    font-weight:800;font-size:13px;color:var(--orange-dark);
+    font-family:Georgia,serif;
+  }
+  .inline-slot .slot-drop{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-width:120px;min-height:32px;
+    padding:4px 12px;
+    border:2px dashed var(--amber);
+    border-radius:8px;
+    background:#fffbeb;
+    font-size:14px;font-weight:700;color:var(--orange-dark);
+    cursor:pointer;
+    transition:.2s;
+    font-family:Georgia,serif;
+  }
+  .inline-slot .slot-drop:hover{background:var(--amber-light);}
+  .inline-slot .slot-drop:empty::before{
+    content:'сюда';
+    color:#d97706;
+    font-weight:500;
+    font-style:italic;
+    font-size:12px;
+  }
+  .inline-slot .slot-drop.filled{
+    background:var(--orange-light);
+    border-style:solid;
+    border-color:var(--orange);
+  }
+  .inline-slot .slot-drop.correct{
+    background:var(--ok-light);border-color:var(--ok);
+    border-style:solid;color:#065f46;
+  }
+  .inline-slot .slot-drop.wrong{
+    background:var(--err-light);border-color:var(--err);
+    border-style:solid;color:#991b1b;
+    animation:shake .4s;
+  }
+
+  .fill-check-btn{
+    padding:10px 24px;border:none;border-radius:10px;
+    background:linear-gradient(135deg,var(--orange),var(--amber));
+    color:#fff;font-size:14px;font-weight:800;cursor:pointer;
+    box-shadow:0 4px 14px rgba(234,88,12,.3);
+  }
+  .fill-check-btn:hover{transform:translateY(-2px);}
+  .fill-result{text-align:center;font-size:14px;font-weight:700;margin-top:8px;min-height:20px;}
+
+  .scheme-flow{display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px 0;}
+  .scheme-step{
+    background:#fff;border:2px solid var(--orange);border-radius:12px;
+    padding:10px 24px;font-size:15px;font-weight:700;color:var(--orange-dark);
+    text-align:center;min-width:280px;
+    box-shadow:0 4px 12px rgba(234,88,12,.08);
+  }
+  .scheme-arrow{color:var(--orange);font-size:18px;font-weight:800;}
+  .scheme-step.highlight{
+    background:linear-gradient(135deg,var(--orange),var(--amber));
+    color:#fff;border-color:transparent;font-size:18px;padding:12px 28px;
+  }
+  .scheme-step.blue{background:linear-gradient(135deg,var(--blue),#1d4ed8);color:#fff;border-color:transparent;}
+  .scheme-duo{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
+
+  nav{
+    position:fixed;bottom:0;left:0;right:0;padding:8px 20px;
+    background:rgba(255,251,245,.9);backdrop-filter:blur(10px);
+    border-top:1px solid var(--border);display:flex;justify-content:space-between;
+    align-items:center;gap:12px;z-index:100;
+  }
+  nav button{padding:8px 20px;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;}
+  nav .nav-prev{background:#fff;color:var(--orange);border:2px solid var(--orange);}
+  nav .nav-prev:hover:not(:disabled){background:var(--orange-light);}
+  nav .nav-next{background:linear-gradient(135deg,var(--orange),var(--amber));color:#fff;}
+  nav button:disabled{opacity:.4;cursor:not-allowed;}
+  nav .nav-info{font-size:12px;font-weight:700;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<span class="bg-leaf l1">🌿</span>
+<span class="bg-leaf l2">🍃</span>
+<span class="bg-leaf l3">🌱</span>
+<span class="bg-leaf l4">🌿</span>
+<span class="bg-leaf l5">🍃</span>
+<span class="bg-leaf l6">🌱</span>
+<span class="bg-leaf l7">🌿</span>
+<span class="bg-leaf l8">🍃</span>
+
+<header>
+  <div class="header-title">Основной урок <span>· Действительные числа</span></div>
+  <div class="progress-pills">
+    <div class="progress-pill theory active" data-slide="0">1</div>
+    <div class="progress-pill theory" data-slide="1">2</div>
+    <div class="progress-pill theory" data-slide="2">3</div>
+    <div class="progress-pill theory" data-slide="3">4</div>
+    <div class="progress-pill theory" data-slide="4">5</div>
+    <div class="progress-pill theory" data-slide="5">6</div>
+    <div class="progress-pill" data-slide="6">7</div>
+    <div class="progress-pill theory" data-slide="7">8</div>
+    <div class="progress-pill" data-slide="8">9</div>
+    <div class="progress-pill theory" data-slide="9">10</div>
+    <div class="progress-pill theory" data-slide="10">11</div>
+    <div class="progress-pill theory" data-slide="11">12</div>
+    <div class="progress-pill theory" data-slide="12">13</div>
+    <div class="progress-pill theory" data-slide="13">14</div>
+    <div class="progress-pill" data-slide="14">Итог</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- 1. ТИТУЛ -->
+  <section class="slide active">
+    <div class="content center">
+      <div style="text-align:center;">
+        <span class="slide-tag theory-tag">Новая тема</span>
+        <h2 style="font-size:42px;margin:18px 0 8px;">Действительные числа</h2>
+        <p style="font-size:17px;color:var(--muted);margin:0 0 32px;">Расширяем представление о числах</p>
+        <div class="formula-highlight big" style="display:inline-block;">$\mathbb{R} = \mathbb{Q} \cup \text{иррациональные}$</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. ЧИСЛОВЫЕ МНОЖЕСТВА -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag theory-tag">Теория</span>
+      <h2 class="blue">Числовые множества</h2>
+    </div>
+    <div class="content center">
+      <div class="theory-block" style="max-width:900px;width:100%;">
+        <h3>Что такое множество чисел?</h3>
+        <p>Множество — это <b>набор чисел</b>, объединённых по какому-то признаку.</p>
+        <p>Каждое следующее множество <b>включает</b> предыдущее:</p>
+        <div class="formula-highlight blue">$\mathbb{N} \subset \mathbb{Z} \subset \mathbb{Q} \subset \mathbb{R}$</div>
+      </div>
+      <div class="key-idea blue" style="max-width:900px;width:100%;">
+        <b>Обозначения:</b> $\mathbb{N}$ — натуральные, $\mathbb{Z}$ — целые, $\mathbb{Q}$ — рациональные, $\mathbb{R}$ — действительные.
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. НАТУРАЛЬНЫЕ И ЦЕЛЫЕ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag theory-tag">Теория</span>
+      <h2 class="blue">Натуральные и целые числа</h2>
+    </div>
+    <div class="content center">
+      <div class="theory-block" style="max-width:900px;width:100%;">
+        <h3>Натуральные числа — $\mathbb{N}$</h3>
+        <p>Числа, которые мы используем <b>при счёте</b>:</p>
+        <div class="formula-highlight blue">$1, 2, 3, 4, 5, \ldots$</div>
+      </div>
+      <div class="theory-block" style="max-width:900px;width:100%;">
+        <h3>Целые числа — $\mathbb{Z}$</h3>
+        <p>Натуральные, <b>им противоположные</b> и <b>нуль</b>:</p>
+        <div class="formula-highlight blue">$\ldots, -3, -2, -1, 0, 1, 2, 3, \ldots$</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. РАЦИОНАЛЬНЫЕ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag theory-tag">Теория</span>
+      <h2 class="blue">Рациональные числа — $\mathbb{Q}$</h2>
+    </div>
+    <div class="content center">
+      <div class="theory-block" style="max-width:900px;width:100%;">
+        <h3>Определение</h3>
+        <p>Рациональное число — это число, которое можно представить в виде дроби:</p>
+        <div class="formula-highlight big">$\dfrac{m}{n}$</div>
+        <p>где $m$ — <b>целое</b> число, $n$ — <b>натуральное</b> ($n \neq 0$).</p>
+      </div>
+      <div class="theory-block" style="max-width:900px;width:100%;">
+        <h3>Какие числа рациональны?</h3>
+        <p>✓ Целые: $5 = \dfrac{5}{1}$, $-3 = \dfrac{-3}{1}$</p>
+        <p>✓ Обыкновенные дроби: $\dfrac{2}{7}$, $\dfrac{5}{3}$</p>
+        <p>✓ Конечные десятичные: $0{,}5 = \dfrac{1}{2}$</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. ВЫЧИСЛИ И ЗАПОЛНИ ПРОПУСКИ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag theory-tag">Теория · История</span>
+      <h2 class="blue">Вычисли и заполни пропуски</h2>
+      <p class="subtitle">Реши примеры в тетради. Найди в тексте справа поле с таким же ответом. Перетащи туда название примера.</p>
+    </div>
+    <div class="content">
+
+      <div class="calc-fill-layout">
+
+        <!-- ЛЕВАЯ ЧАСТЬ: примеры без ответов -->
+        <div class="calc-fill-left">
+          <h3 class="mini-title">1. Примеры и их названия</h3>
+
+          <div class="calc-item">
+            <div class="ci-word" data-word="naturalis">Naturalis</div>
+            <div class="ci-body">
+              <span class="ci-expr">$\left(-\dfrac{2}{7}\right)^2 + 1\dfrac{45}{49} = \; \square$</span>
+            </div>
+          </div>
+
+          <div class="calc-item">
+            <div class="ci-word" data-word="quotient">Quotient</div>
+            <div class="ci-body">
+              <span class="ci-expr">$1{,}2 \cdot \dfrac{5}{6} - 1\dfrac{1}{3} = \; \square$</span>
+            </div>
+          </div>
+
+          <div class="calc-item">
+            <div class="ci-word" data-word="ratio">Ratio</div>
+            <div class="ci-body">
+              <span class="ci-expr">$0{,}3 : 0{,}2 + \dfrac{1}{6} = \; \square$</span>
+            </div>
+          </div>
+
+          <div class="calc-item">
+            <div class="ci-word" data-word="zahl">Zahl</div>
+            <div class="ci-body">
+              <span class="ci-expr">$(-1)^7 + (-1)^9 = \; \square$</span>
+            </div>
+          </div>
+
+          <div class="calc-hint">
+            💡 <b>Как работать:</b> реши пример в тетради, получи число. В тексте справа найди поле с таким же числом. Кликни на название примера → кликни на это поле.
+          </div>
+        </div>
+
+        <!-- ПРАВАЯ ЧАСТЬ -->
+        <div class="calc-fill-right">
+          <h3 class="mini-title">2. Заполни пропуски</h3>
+
+          <div class="fill-text-compact">
+
+            <p>1. Для счёта предметов используются <b>натуральные</b> числа. Множество натуральных чисел обозначается буквой
+              <span class="answer-badge">N</span>
+              — первой буквой латинского слова
+              <span class="inline-slot" data-correct="naturalis">
+                <span class="slot-num">2</span>
+                <span class="slot-drop"></span>
+              </span>,
+              что переводится как «естественный».</p>
+
+            <p>2. Натуральные числа, противоположные им и нуль образуют множество <b>целых</b> чисел. Оно обозначается буквой
+              <span class="answer-badge">Z</span>
+              — первой буквой немецкого слова
+              <span class="inline-slot" data-correct="zahl">
+                <span class="slot-num">−2</span>
+                <span class="slot-drop"></span>
+              </span> — «число».</p>
+
+            <p>3. Множество чисел вида $\dfrac{m}{n}$ — это <b>рациональные</b> числа. Оно обозначается буквой
+              <span class="answer-badge">Q</span>
+              — первой буквой французского слова
+              <span class="inline-slot" data-correct="quotient">
+                <span class="slot-num">−1/3</span>
+                <span class="slot-drop"></span>
+              </span> — «отношение».
+              Название этого множества происходит от латинского слова
+              <span class="inline-slot" data-correct="ratio">
+                <span class="slot-num">1 2/3</span>
+                <span class="slot-drop"></span>
+              </span>, что также переводится как «отношение».</p>
+
+          </div>
+        </div>
+
+      </div>
+
+      <div style="display:flex;justify-content:center;gap:10px;margin-top:8px;">
+        <button class="fill-check-btn" onclick="checkCalcFillV4()">✓ Проверить</button>
+        <button class="fill-check-btn" style="background:#fff;color:var(--orange);border:2px solid var(--orange);" onclick="resetCalcFillV4()">↺ Сбросить</button>
+      </div>
+      <div class="fill-result" id="calcFillV4Result"></div>
+
+    </div>
+  </section>
+
+  <!-- 6. ДИАГРАММА ЭЙЛЕРА -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag theory-tag">Теория · История</span>
+      <h2 class="blue">Диаграмма Эйлера</h2>
+      <p class="subtitle">Так наглядно показывают, как множества вложены друг в друга.</p>
+    </div>
+    <div class="content">
+      <div class="euler-layout">
+
+        <div class="euler-diagram">
+          <svg viewBox="0 0 500 420" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+            <ellipse cx="250" cy="210" rx="220" ry="175" fill="#ffedd5" stroke="#ea580c" stroke-width="3" opacity="0.7"/>
+            <ellipse cx="250" cy="220" rx="160" ry="120" fill="#fed7aa" stroke="#d97706" stroke-width="3" opacity="0.85"/>
+            <ellipse cx="240" cy="230" rx="95" ry="65" fill="#fef3c7" stroke="#f59e0b" stroke-width="3"/>
+            <circle cx="240" cy="230" r="28" fill="#fff" stroke="#f59e0b" stroke-width="3"/>
+            <text x="240" y="241" font-size="28" fill="#78350f" font-weight="bold" text-anchor="middle" font-family="Georgia, serif">N</text>
+            <circle cx="380" cy="155" r="30" fill="#fff" stroke="#d97706" stroke-width="3"/>
+            <text x="380" y="166" font-size="28" fill="#92400e" font-weight="bold" text-anchor="middle" font-family="Georgia, serif">Z</text>
+            <circle cx="435" cy="80" r="30" fill="#fff" stroke="#ea580c" stroke-width="3"/>
+            <text x="435" y="91" font-size="28" fill="#c2410c" font-weight="bold" text-anchor="middle" font-family="Georgia, serif">Q</text>
+          </svg>
+        </div>
+
+        <div class="euler-text">
+          <div class="theory-block" style="text-align:left;">
+            <h3>Кто такой Эйлер?</h3>
+            <p><b>Леонардо Эйлер</b> — великий математик XVIII века. Большую часть жизни работал в <b>России</b>, в Петербургской академии наук.</p>
+            <p>Он придумал <b>наглядный способ</b> показывать множества — вложенные овалы с буквами в кругах.</p>
+          </div>
+          <div class="key-idea blue">
+            <b>Смысл:</b> овал $\mathbb{N}$ лежит <b>внутри</b> $\mathbb{Z}$, а $\mathbb{Z}$ — <b>внутри</b> $\mathbb{Q}$.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. РАЦИОНАЛЬНОЕ ИЛИ НЕТ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag result-tag">Практика</span>
+      <h2 class="green">Рациональное или нет?</h2>
+    </div>
+    <div class="content">
+      <div class="detect-grid">
+        <div class="detect-card" data-answer="yes">
+          <div class="formula">$\dfrac{3}{8}$</div>
+          <div class="options">
+            <div class="opt" onclick="checkDetect(this, 'yes')">Рациональное</div>
+            <div class="opt" onclick="checkDetect(this, 'no')">Нет</div>
+          </div>
+        </div>
+        <div class="detect-card" data-answer="yes">
+          <div class="formula">$-7$</div>
+          <div class="options">
+            <div class="opt" onclick="checkDetect(this, 'yes')">Рациональное</div>
+            <div class="opt" onclick="checkDetect(this, 'no')">Нет</div>
+          </div>
+        </div>
+        <div class="detect-card" data-answer="yes">
+          <div class="formula">$0{,}6$</div>
+          <div class="options">
+            <div class="opt" onclick="checkDetect(this, 'yes')">Рациональное</div>
+            <div class="opt" onclick="checkDetect(this, 'no')">Нет</div>
+          </div>
+        </div>
+        <div class="detect-card" data-answer="yes">
+          <div class="formula">$2{,}5$</div>
+          <div class="options">
+            <div class="opt" onclick="checkDetect(this, 'yes')">Рациональное</div>
+            <div class="opt" onclick="checkDetect(this, 'no')">Нет</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. ПЕРИОДИЧЕСКИЕ ДРОБИ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag theory-tag">Теория</span>
+      <h2 class="blue">Периодические десятичные дроби</h2>
+    </div>
+    <div class="content center">
+      <div class="theory-block" style="max-width:900px;width:100%;">
+        <h3>Пример</h3>
+        <p>Разделим $1$ на $3$:</p>
+        <div class="formula-highlight">$\dfrac{1}{3} = 0{,}333333\ldots = 0{,}(3)$</div>
+        <p>Скобки показывают, что цифра (или группа цифр) повторяется.</p>
+      </div>
+      <div class="theory-block" style="max-width:900px;width:100%;">
+        <h3>Ещё примеры</h3>
+        <p>$\dfrac{1}{6} = 0{,}1(6)$ &nbsp;·&nbsp; $\dfrac{2}{11} = 0{,}(18)$ &nbsp;·&nbsp; $\dfrac{5}{12} = 0{,}41(6)$</p>
+      </div>
+      <div class="key-idea blue" style="max-width:900px;width:100%;">
+        <b>Важно:</b> любое рациональное число можно записать в виде <b>конечной</b> или <b>бесконечной периодической</b> дроби.
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. ЗАПИШИ ДРОБЬ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag result-tag">Практика</span>
+      <h2 class="green">Запиши дробь в виде десятичной</h2>
+      <p class="subtitle">Бесконечные дроби — с указанием периода.</p>
+    </div>
+    <div class="content">
+      <div class="tasks-grid-4">
+        <div class="task-card">
+          <div class="tc-head"><span class="tc-letter">а</span><div class="tc-expr">$\dfrac{1}{2}$</div></div>
+          <div class="tc-work"></div>
+        </div>
+        <div class="task-card">
+          <div class="tc-head"><span class="tc-letter">б</span><div class="tc-expr">$\dfrac{3}{5}$</div></div>
+          <div class="tc-work"></div>
+        </div>
+        <div class="task-card">
+          <div class="tc-head"><span class="tc-letter">в</span><div class="tc-expr">$\dfrac{5}{6}$</div></div>
+          <div class="tc-work"></div>
+        </div>
+        <div class="task-card">
+          <div class="tc-head"><span class="tc-letter">г</span><div class="tc-expr">$\dfrac{7}{9}$</div></div>
+          <div class="tc-work"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. ИРРАЦИОНАЛЬНЫЕ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag theory-tag">Теория</span>
+      <h2 class="blue">Иррациональные числа</h2>
+    </div>
+    <div class="content center">
+      <div class="theory-block" style="max-width:900px;width:100%;">
+        <h3>Определение</h3>
+        <p>Иррациональное число — это число, которое <b>нельзя</b> представить в виде дроби $\dfrac{m}{n}$.</p>
+        <p>В десятичной записи — <b>бесконечная непериодическая</b> дробь.</p>
+      </div>
+      <div class="key-idea blue" style="max-width:900px;width:100%;">
+        <b>Мысль:</b> если десятичная дробь бесконечна и <b>не повторяется</b> — это иррациональное число.
+      </div>
+    </div>
+  </section>
+
+  <!-- 11. ПРИМЕРЫ ИРРАЦИОНАЛЬНЫХ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag theory-tag">Теория</span>
+      <h2 class="blue">Примеры иррациональных</h2>
+    </div>
+    <div class="content center">
+      <div class="theory-block" style="max-width:900px;width:100%;text-align:center;">
+        <h3>$\sqrt{2}$ — корень из двух</h3>
+        <div class="formula-highlight">$\sqrt{2} = 1{,}41421356\ldots$</div>
+        <p>Нельзя записать в виде дроби $\dfrac{m}{n}$.</p>
+      </div>
+      <div class="theory-block" style="max-width:900px;width:100%;text-align:center;">
+        <h3>$\pi$ — число «пи»</h3>
+        <div class="formula-highlight">$\pi = 3{,}14159265\ldots$</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12. ДЕЙСТВИТЕЛЬНЫЕ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag theory-tag">Теория</span>
+      <h2 class="blue">Действительные числа — $\mathbb{R}$</h2>
+    </div>
+    <div class="content center">
+      <div class="theory-block" style="max-width:900px;width:100%;text-align:center;">
+        <h3>Определение</h3>
+        <p>Действительные числа — это <b>все рациональные</b> и <b>все иррациональные</b> числа вместе.</p>
+        <div class="formula-highlight big">$\mathbb{R} = \mathbb{Q} \cup \text{иррациональные}$</div>
+      </div>
+      <div class="theory-block" style="max-width:900px;width:100%;">
+        <h3>Что входит в $\mathbb{R}$</h3>
+        <p>✓ Натуральные · ✓ Целые · ✓ Дробные · ✓ Иррациональные</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13. ЧИСЛА И ПРЯМАЯ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag theory-tag">Теория</span>
+      <h2 class="blue">Числа и координатная прямая</h2>
+    </div>
+    <div class="content center">
+      <div class="theory-block" style="max-width:900px;width:100%;">
+        <h3>Взаимосвязь</h3>
+        <p>Каждой точке координатной прямой соответствует <b>одно и только одно</b> действительное число. И наоборот.</p>
+        <p>Поэтому координатную прямую называют <b>числовой прямой</b>.</p>
+      </div>
+      <div style="max-width:900px;width:100%;background:#fff;border:2px solid var(--border);border-radius:12px;padding:20px;">
+        <svg viewBox="0 0 800 130" xmlns="http://www.w3.org/2000/svg">
+          <line x1="20" y1="70" x2="780" y2="70" stroke="#334155" stroke-width="2"/>
+          <polygon points="778,70 768,65 768,75" fill="#334155"/>
+          <g font-size="14" font-family="Segoe UI" fill="#334155" font-weight="bold" text-anchor="middle">
+            <circle cx="100" cy="70" r="3" fill="#334155"/><text x="100" y="95">−3</text>
+            <circle cx="200" cy="70" r="3" fill="#334155"/><text x="200" y="95">−2</text>
+            <circle cx="300" cy="70" r="3" fill="#334155"/><text x="300" y="95">−1</text>
+            <circle cx="400" cy="70" r="3" fill="#334155"/><text x="400" y="95">0</text>
+            <circle cx="500" cy="70" r="3" fill="#334155"/><text x="500" y="95">1</text>
+            <circle cx="600" cy="70" r="3" fill="#334155"/><text x="600" y="95">2</text>
+            <circle cx="700" cy="70" r="3" fill="#334155"/><text x="700" y="95">3</text>
+          </g>
+          <circle cx="150" cy="70" r="6" fill="#ea580c" stroke="#fff" stroke-width="2"/>
+          <text x="150" y="50" font-size="13" fill="#ea580c" font-weight="bold" text-anchor="middle">−2,5</text>
+          <circle cx="450" cy="70" r="6" fill="#2563eb" stroke="#fff" stroke-width="2"/>
+          <text x="450" y="50" font-size="13" fill="#2563eb" font-weight="bold" text-anchor="middle">0,5</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- 14. ТОЧКА ВНЕ Q -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag theory-tag">Размышление</span>
+      <h2 class="blue">Что находится вне $\mathbb{Q}$?</h2>
+    </div>
+    <div class="content">
+      <div class="euler-layout">
+        <div class="euler-diagram">
+          <svg viewBox="0 0 500 420" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+            <ellipse cx="230" cy="210" rx="200" ry="160" fill="#ffedd5" stroke="#ea580c" stroke-width="3" opacity="0.7"/>
+            <ellipse cx="230" cy="220" rx="140" ry="105" fill="#fed7aa" stroke="#d97706" stroke-width="3" opacity="0.85"/>
+            <ellipse cx="220" cy="230" rx="80" ry="55" fill="#fef3c7" stroke="#f59e0b" stroke-width="3"/>
+            <circle cx="220" cy="230" r="24" fill="#fff" stroke="#f59e0b" stroke-width="3"/>
+            <text x="220" y="240" font-size="24" fill="#78350f" font-weight="bold" text-anchor="middle" font-family="Georgia, serif">N</text>
+            <circle cx="335" cy="170" r="26" fill="#fff" stroke="#d97706" stroke-width="3"/>
+            <text x="335" y="180" font-size="24" fill="#92400e" font-weight="bold" text-anchor="middle" font-family="Georgia, serif">Z</text>
+            <circle cx="385" cy="105" r="26" fill="#fff" stroke="#ea580c" stroke-width="3"/>
+            <text x="385" y="115" font-size="24" fill="#c2410c" font-weight="bold" text-anchor="middle" font-family="Georgia, serif">Q</text>
+            <circle cx="465" cy="360" r="9" fill="#dc2626" stroke="#fff" stroke-width="2"/>
+            <text x="475" y="352" font-size="18" fill="#dc2626" font-weight="bold">k</text>
+          </svg>
+        </div>
+        <div class="euler-text">
+          <div class="theory-block" style="text-align:left;">
+            <h3>Точка $k$ — вне $\mathbb{Q}$</h3>
+            <p>Точка $k$ <b>не входит</b> ни в $\mathbb{N}$, ни в $\mathbb{Z}$, ни в $\mathbb{Q}$.</p>
+            <p>Значит, $k$ — <b>иррациональное число</b>.</p>
+          </div>
+          <div class="key-idea blue">
+            <b>Примеры:</b> $\sqrt{2}$, $\sqrt{3}$, $\pi$, $e$.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 15. ИТОГ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag">Итог</span>
+      <h2>Собираем всё вместе</h2>
+    </div>
+    <div class="content center">
+      <div class="scheme-flow">
+        <div class="scheme-step highlight">Действительные числа $\mathbb{R}$</div>
+        <div class="scheme-arrow">↓</div>
+        <div class="scheme-duo">
+          <div class="scheme-step blue" style="min-width:260px;">Рациональные $\mathbb{Q}$</div>
+          <div class="scheme-step" style="min-width:260px;">Иррациональные</div>
+        </div>
+        <div class="scheme-arrow">↓</div>
+        <div class="scheme-step">Целые $\mathbb{Z}$ &nbsp;+&nbsp; дробные</div>
+        <div class="scheme-arrow">↓</div>
+        <div class="scheme-step">Натуральные $\mathbb{N}$ &nbsp;·&nbsp; Нуль &nbsp;·&nbsp; Отрицательные</div>
+        <div class="scheme-arrow">↓</div>
+        <div class="scheme-step">Каждое число — точка на координатной прямой</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<nav>
+  <button class="nav-prev" id="navPrev" onclick="changeSlide(-1)" disabled>← Назад</button>
+  <div class="nav-info" id="navInfo">Слайд 1 из 15</div>
+  <button class="nav-next" id="navNext" onclick="changeSlide(1)">Далее →</button>
+</nav>
+
+<script>
+var current = 0;
+var slides = document.querySelectorAll('.slide');
+var total = slides.length;
+var prevBtn = document.getElementById('navPrev');
+var nextBtn = document.getElementById('navNext');
+var navInfo = document.getElementById('navInfo');
+var pills = document.querySelectorAll('.progress-pill');
+
+function showSlide(i){
+  slides.forEach(function(s, idx){ s.classList.toggle('active', idx === i); });
+  pills.forEach(function(p, idx){
+    p.classList.toggle('active', idx === i);
+    p.classList.toggle('done', idx < i);
+  });
+  prevBtn.disabled = (i === 0);
+  nextBtn.disabled = (i === total - 1);
+  navInfo.textContent = 'Слайд ' + (i + 1) + ' из ' + total;
+  renderMath();
+}
+
+function changeSlide(dir){
+  current = Math.min(Math.max(current + dir, 0), total - 1);
+  showSlide(current);
+}
+
+pills.forEach(function(p, idx){
+  p.addEventListener('click', function(){
+    current = idx;
+    showSlide(current);
+  });
+});
+
+function renderMath(){
+  if(window.MathJax && MathJax.typesetPromise){
+    MathJax.typesetPromise().catch(function(err){ console.log('MathJax error:', err); });
+  }
+}
+
+function checkDetect(btn, answer){
+  var card = btn.closest('.detect-card');
+  if(card.dataset.answered === 'true') return;
+  var correct = card.dataset.answer;
+  var allOpts = card.querySelectorAll('.opt');
+  if(answer === correct){
+    btn.classList.add('correct');
+    card.classList.add('answered-correct');
+    card.dataset.answered = 'true';
+    allOpts.forEach(function(o){ o.disabled = true; });
+  } else {
+    btn.classList.add('wrong');
+    card.classList.add('answered-wrong');
+    setTimeout(function(){
+      btn.classList.remove('wrong');
+      card.classList.remove('answered-wrong');
+    }, 900);
+  }
+}
+
+/* ПЕРЕТАСКИВАНИЕ СЛОВ */
+var selectedChipV4 = null;
+
+document.querySelectorAll('.ci-word').forEach(function(word){
+  word.addEventListener('click', function(){
+    if(word.classList.contains('used')) return;
+    document.querySelectorAll('.ci-word.selected').forEach(function(w){
+      w.classList.remove('selected');
+    });
+    word.classList.add('selected');
+    selectedChipV4 = word;
+  });
+});
+
+document.querySelectorAll('.slot-drop').forEach(function(slot){
+  slot.addEventListener('click', function(e){
+    e.stopPropagation();
+
+    if(slot.classList.contains('filled')){
+      var word = slot.dataset.current;
+      var chip = document.querySelector('.ci-word[data-word="' + word + '"]');
+      if(chip){
+        chip.classList.remove('used');
+        chip.style.display = '';
+      }
+      slot.classList.remove('filled','correct','wrong');
+      slot.textContent = '';
+      slot.dataset.current = '';
+      return;
+    }
+
+    if(!selectedChipV4) return;
+    var word = selectedChipV4.dataset.word;
+    slot.textContent = word.charAt(0).toUpperCase() + word.slice(1);
+    slot.classList.add('filled');
+    slot.dataset.current = word;
+    selectedChipV4.classList.add('used');
+    selectedChipV4.classList.remove('selected');
+    selectedChipV4.style.display = 'none';
+    selectedChipV4 = null;
+  });
+});
+
+function checkCalcFillV4(){
+  var slots = document.querySelectorAll('.slot-drop');
+  var correct = 0;
+  var filled = 0;
+
+  slots.forEach(function(slot){
+    var current = slot.dataset.current || '';
+    var correctWord = slot.closest('.inline-slot').dataset.correct;
+    slot.classList.remove('correct','wrong');
+    if(current === '') return;
+    filled++;
+    if(current === correctWord){
+      slot.classList.add('correct');
+      correct++;
+    } else {
+      slot.classList.add('wrong');
+    }
+  });
+
+  var res = document.getElementById('calcFillV4Result');
+  var total = slots.length;
+
+  if(filled === 0){
+    res.textContent = '⚠️ Сначала перетащи хотя бы одно слово';
+    res.style.color = '#d97706';
+  } else if(correct === total){
+    res.textContent = '🎉 Отлично! Все 4 слова на своих местах!';
+    res.style.color = '#10b981';
+  } else {
+    res.textContent = 'Правильно: ' + correct + ' из ' + total + '. Проверь красные окошки.';
+    res.style.color = '#d97706';
+  }
+}
+
+function resetCalcFillV4(){
+  document.querySelectorAll('.slot-drop').forEach(function(slot){
+    slot.classList.remove('filled','correct','wrong');
+    slot.textContent = '';
+    slot.dataset.current = '';
+  });
+  document.querySelectorAll('.ci-word').forEach(function(w){
+    w.classList.remove('used','selected');
+    w.style.display = '';
+  });
+  document.getElementById('calcFillV4Result').textContent = '';
+  selectedChipV4 = null;
+}
+
+window.addEventListener('load', function(){
+  showSlide(0);
+  renderMath();
+  setTimeout(renderMath, 500);
+  setTimeout(renderMath, 1500);
+});
+</script>
+
+</body>
+</html>
