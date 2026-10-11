@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Актуализация · Действительные числа</title>
+<script>
+MathJax = {
+  tex: {inlineMath: [['$','$'],['\\(','\\)']]},
+  svg: {fontCache: 'global'}
+};
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root{
+    --orange:#ea580c;--orange-dark:#c2410c;--orange-light:#ffedd5;
+    --amber:#f59e0b;--amber-dark:#d97706;--amber-light:#fef3c7;
+    --ok:#10b981;--ok-light:#d1fae5;--err:#ef4444;--err-light:#fee2e2;
+    --blue:#2563eb;--blue-dark:#1e40af;--blue-light:#dbeafe;
+    --green:#16a34a;--green-light:#dcfce7;
+    --pink:#ec4899;--pink-dark:#9f1239;--pink-light:#fce7f3;
+    --text:#1e293b;--muted:#78716c;--border:#fed7aa;
+  }
+  *{box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif;}
+  html,body{margin:0;padding:0;height:100%;overflow:hidden;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 5% -5%, #ffedd5 0%, transparent 55%),
+      radial-gradient(900px 500px at 100% 100%, #fef3c7 0%, transparent 55%),
+      #fffbf5;
+    color:var(--text);height:100vh;display:flex;flex-direction:column;position:relative;
+  }
+
+  .bg-leaf{position:fixed;pointer-events:none;z-index:0;user-select:none;}
+  .bg-leaf.l1{top:6%;left:3%;transform:rotate(-25deg);font-size:80px;opacity:.14;}
+  .bg-leaf.l2{top:35%;right:4%;transform:rotate(35deg);font-size:110px;opacity:.1;}
+  .bg-leaf.l3{bottom:10%;left:10%;transform:rotate(15deg);font-size:90px;opacity:.12;}
+  .bg-leaf.l4{bottom:5%;right:15%;transform:rotate(-45deg);font-size:70px;opacity:.13;}
+  .bg-leaf.l5{top:15%;right:35%;transform:rotate(-10deg);font-size:60px;opacity:.11;}
+  .bg-leaf.l6{bottom:40%;left:40%;transform:rotate(120deg);font-size:70px;opacity:.09;}
+  .bg-leaf.l7{top:70%;left:2%;transform:rotate(60deg);font-size:65px;opacity:.1;}
+  .bg-leaf.l8{top:5%;right:8%;transform:rotate(-60deg);font-size:80px;opacity:.12;}
+
+  header{
+    padding:10px 24px;display:flex;justify-content:space-between;align-items:center;
+    background:rgba(255,251,245,.85);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px;
+    position:relative;z-index:10;flex-shrink:0;
+  }
+  .header-title{font-size:13px;font-weight:800;color:var(--orange-dark);}
+  .header-title span{color:var(--muted);font-weight:600;margin-left:8px;}
+  .progress-pills{display:flex;gap:6px;align-items:center;}
+  .progress-pill{
+    height:28px;min-width:28px;padding:0 11px;border-radius:14px;
+    background:#fff;border:2px solid var(--border);
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:800;color:var(--muted);cursor:pointer;
+  }
+  .progress-pill:hover{border-color:var(--orange);color:var(--orange);}
+  .progress-pill.active{background:linear-gradient(135deg,var(--orange),var(--amber));color:#fff;border-color:transparent;}
+  .progress-pill.done{background:var(--ok-light);color:var(--ok);border-color:var(--ok);}
+
+  main{flex:1;padding:16px 20px 90px;display:flex;justify-content:center;position:relative;z-index:5;overflow:hidden;min-height:0;}
+  .slide{
+    display:none;background:#fffdf9;border-radius:20px;
+    padding:22px 32px;box-shadow:0 14px 50px rgba(234,88,12,.12);
+    border:1px solid var(--border);width:100%;max-width:1400px;
+    animation:fade .4s ease;position:relative;overflow:hidden;height:100%;flex-direction:column;
+  }
+  .slide.active{display:flex;}
+  @keyframes fade{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
+  .slide::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;background:radial-gradient(circle,rgba(254,215,170,.5) 0%,transparent 70%);pointer-events:none;}
+  .slide::after{content:'🌿';position:absolute;bottom:-15px;right:20px;font-size:100px;opacity:.05;transform:rotate(-20deg);pointer-events:none;}
+
+  .slide-header{flex-shrink:0;margin-bottom:16px;position:relative;z-index:2;}
+  .slide-tag{
+    display:inline-block;background:var(--amber-light);color:var(--amber-dark);
+    padding:4px 12px;border-radius:16px;font-size:11px;font-weight:700;margin-bottom:8px;
+    border:1px solid rgba(245,158,11,.3);
+  }
+  .slide h2{font-size:22px;margin:0 0 4px;color:var(--orange-dark);font-weight:800;letter-spacing:-.3px;}
+  .slide .subtitle{color:var(--muted);font-size:13px;margin:0;}
+
+  .content{flex:1;display:flex;flex-direction:column;min-height:0;position:relative;z-index:2;}
+
+  /* ФЛИП-КАРТЫ */
+  .flip-grid{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:20px;
+    flex:1;min-height:0;align-content:center;
+  }
+  .flip-card{perspective:1200px;height:180px;cursor:pointer;}
+  .flip-inner{
+    position:relative;width:100%;height:100%;
+    transition:transform .7s cubic-bezier(.4,.2,.2,1);
+    transform-style:preserve-3d;
+  }
+  .flip-card.flipped .flip-inner{transform:rotateY(180deg);}
+  .flip-front,.flip-back{
+    position:absolute;width:100%;height:100%;
+    backface-visibility:hidden;border-radius:18px;
+    display:flex;align-items:center;justify-content:center;
+    padding:22px;text-align:center;font-size:18px;
+    box-shadow:0 8px 24px rgba(15,23,42,.12);
+    line-height:1.4;
+  }
+  .flip-front{
+    background:linear-gradient(135deg,var(--orange),var(--amber));
+    color:#fff;font-weight:700;
+  }
+  .flip-front .hint-icon{position:absolute;top:12px;right:16px;font-size:16px;opacity:.7;}
+  .flip-back{
+    background:linear-gradient(135deg,#ecfdf5,#d1fae5);
+    color:#065f46;font-weight:700;transform:rotateY(180deg);
+    border:2px solid var(--ok);font-size:16px;
+  }
+
+  /* РАСПРЕДЕЛИ ЧИСЛА ПО ГРУППАМ */
+  .groups-layout{
+    flex:1;display:flex;flex-direction:column;gap:14px;
+    min-height:0;
+  }
+  .groups-baskets{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:12px;
+    min-height:0;flex-shrink:0;
+  }
+  @media (max-width:1000px){.groups-baskets{grid-template-columns:repeat(2,1fr);}}
+
+  .basket{
+    background:#fff;border:2px solid var(--border);border-radius:12px;
+    padding:10px 10px 12px;display:flex;flex-direction:column;gap:8px;
+    transition:.25s;min-height:180px;
+  }
+  .basket:hover{
+    border-color:var(--orange);
+    background:#fffdf9;
+  }
+  .basket-title{
+    font-size:13px;font-weight:800;text-align:center;
+    padding:4px 6px;border-radius:8px;
+    background:#f8fafc;
+    border-bottom:2px solid var(--border);
+    flex-shrink:0;
+  }
+  .basket-drop{
+    flex:1;display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;
+    min-height:80px;
+  }
+
+  .pool-label{
+    font-size:13px;font-weight:800;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.5px;
+    padding:6px 0 0;
+    flex-shrink:0;
+  }
+  .pool{
+    background:linear-gradient(135deg,#fff7ed,#ffedd5);
+    border:2px dashed var(--amber);border-radius:12px;
+    padding:12px 14px;
+    display:flex;flex-wrap:wrap;gap:10px;
+    min-height:80px;flex-shrink:0;
+    align-items:center;justify-content:center;
+  }
+
+  .num-chip{
+    background:#fff;border:2px solid var(--border);border-radius:10px;
+    padding:10px 16px;font-size:18px;font-weight:800;
+    color:var(--orange-dark);cursor:pointer;
+    transition:.2s;user-select:none;
+    display:flex;align-items:center;justify-content:center;
+    min-width:64px;
+  }
+  .num-chip:hover{
+    border-color:var(--orange);background:var(--orange-light);
+    transform:translateY(-2px);
+  }
+  .num-chip.selected{
+    background:linear-gradient(135deg,var(--orange),var(--amber));
+    color:#fff;border-color:transparent;
+    transform:scale(1.05);
+    box-shadow:0 6px 18px rgba(234,88,12,.3);
+  }
+  .num-chip.in-basket{
+    padding:6px 12px;font-size:15px;min-width:auto;
+  }
+  .num-chip.correct-answer{
+    border-color:var(--ok);background:var(--ok-light);color:#065f46;
+  }
+  .num-chip.wrong-answer{
+    border-color:var(--err);background:var(--err-light);color:#991b1b;
+  }
+
+  .group-actions{
+    display:flex;gap:10px;justify-content:center;
+    flex-shrink:0;
+  }
+  .check-groups-btn{
+    padding:12px 30px;border:none;border-radius:11px;
+    background:linear-gradient(135deg,var(--orange),var(--amber));
+    color:#fff;font-size:15px;font-weight:800;cursor:pointer;
+    transition:.2s;box-shadow:0 4px 14px rgba(234,88,12,.3);
+  }
+  .check-groups-btn:hover{transform:translateY(-2px);}
+  .reset-groups-btn{
+    padding:12px 24px;border:2px solid var(--orange);
+    background:#fff;color:var(--orange);
+    border-radius:11px;font-size:15px;font-weight:800;
+    cursor:pointer;transition:.2s;
+  }
+  .reset-groups-btn:hover{background:var(--orange-light);}
+
+  .groups-result{
+    text-align:center;padding:10px 16px;border-radius:10px;
+    font-size:14px;font-weight:700;display:none;
+    flex-shrink:0;
+  }
+  .groups-result.show{display:block;}
+  .groups-result.ok{background:var(--ok-light);color:#065f46;border-left:4px solid var(--ok);}
+  .groups-result.partial{background:var(--amber-light);color:#92400e;border-left:4px solid var(--amber-dark);}
+
+  /* КООРДИНАТНАЯ ПРЯМАЯ */
+  .line-layout{
+    flex:1;display:grid;grid-template-columns:1.2fr 1fr;gap:22px;
+    min-height:0;align-items:center;
+  }
+  @media (max-width:1000px){.line-layout{grid-template-columns:1fr;}}
+
+  .number-line{
+    background:#fff;border:2px solid var(--border);border-radius:14px;
+    padding:20px;display:flex;align-items:center;justify-content:center;
+    min-height:0;
+  }
+  .number-line svg{width:100%;height:auto;max-height:400px;display:block;}
+
+  .line-tasks{display:flex;flex-direction:column;gap:10px;}
+  .line-task{
+    background:#fff;border:2px solid var(--border);border-radius:12px;
+    padding:12px 16px;display:flex;align-items:center;gap:12px;
+    transition:.2s;cursor:pointer;
+  }
+  .line-task:hover{border-color:var(--orange);background:var(--orange-light);}
+  .line-task.correct{background:var(--ok-light);border-color:var(--ok);}
+  .line-task.wrong{background:var(--err-light);border-color:var(--err);}
+  .line-task .task-num{font-weight:800;font-size:14px;min-width:20px;color:var(--orange-dark);}
+  .line-task .task-text{flex:1;font-size:15px;font-weight:600;}
+
+  .result-msg{margin-top:10px;font-size:14px;font-weight:700;text-align:center;min-height:20px;}
+  .result-msg.ok{color:var(--ok);}
+  .result-msg.err{color:var(--err);}
+
+  /* ВВОД */
+  .input-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:20px;
+    flex:1;min-height:0;align-content:center;
+  }
+  @media (max-width:900px){.input-grid{grid-template-columns:1fr;}}
+
+  .input-card{
+    background:#fff;border:3px solid var(--border);border-radius:14px;
+    padding:22px 24px;display:flex;flex-direction:column;gap:16px;
+    transition:.25s;text-align:center;
+  }
+  .input-card:hover{border-color:var(--orange);}
+  .input-card .point{font-size:22px;font-weight:800;color:var(--orange-dark);}
+  .input-card .text{font-size:13px;color:var(--muted);line-height:1.5;}
+  .input-card .row{display:flex;align-items:center;justify-content:center;gap:8px;font-size:18px;font-weight:800;}
+  .input-card .row input{
+    width:90px;padding:10px 6px;border:2px solid var(--border);
+    border-radius:9px;font-size:18px;font-family:inherit;text-align:center;font-weight:800;background:#fff;
+  }
+  .input-card .row input:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(234,88,12,.12);}
+  .input-card .row input.correct{background:var(--ok-light);border-color:var(--ok);color:#065f46;}
+  .input-card .row input.wrong{background:var(--err-light);border-color:var(--err);color:#991b1b;}
+  .input-card.answered-correct{background:linear-gradient(135deg,#f0fdf4,#fff);border-color:var(--ok);}
+  .input-card.answered-wrong{background:linear-gradient(135deg,#fef2f2,#fff);border-color:var(--err);}
+
+  nav{
+    position:fixed;bottom:0;left:0;right:0;padding:10px 24px;
+    background:rgba(255,251,245,.9);backdrop-filter:blur(10px);
+    border-top:1px solid var(--border);display:flex;justify-content:space-between;
+    align-items:center;gap:14px;z-index:100;
+  }
+  nav button{padding:9px 22px;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;}
+  nav .nav-prev{background:#fff;color:var(--orange);border:2px solid var(--orange);}
+  nav .nav-prev:hover:not(:disabled){background:var(--orange-light);}
+  nav .nav-next{background:linear-gradient(135deg,var(--orange),var(--amber));color:#fff;}
+  nav button:disabled{opacity:.4;cursor:not-allowed;}
+  nav .nav-info{font-size:12px;font-weight:700;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<span class="bg-leaf l1">🌿</span>
+<span class="bg-leaf l2">🍃</span>
+<span class="bg-leaf l3">🌱</span>
+<span class="bg-leaf l4">🌿</span>
+<span class="bg-leaf l5">🍃</span>
+<span class="bg-leaf l6">🌱</span>
+<span class="bg-leaf l7">🌿</span>
+<span class="bg-leaf l8">🍃</span>
+
+<header>
+  <div class="header-title">Актуализация · Действительные числа</div>
+  <div class="progress-pills">
+    <div class="progress-pill active" data-slide="0">1</div>
+    <div class="progress-pill" data-slide="1">2</div>
+    <div class="progress-pill" data-slide="2">3</div>
+    <div class="progress-pill" data-slide="3">4</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- СЛАЙД 1. ФЛИП-КАРТЫ -->
+  <section class="slide active">
+    <div class="slide-header">
+      <span class="slide-tag">Задание 1 · Вспомним</span>
+      <h2>Что мы знаем о числах?</h2>
+      <p class="subtitle">Нажми на карточку — проверь себя.</p>
+    </div>
+    <div class="content">
+      <div class="flip-grid">
+
+        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+          <div class="flip-inner">
+            <div class="flip-front">Что такое натуральные числа?<span class="hint-icon">👆</span></div>
+            <div class="flip-back">Числа, которые мы используем при счёте: $1, 2, 3, \ldots$<br><small>Обозначаются $\mathbb{N}$</small></div>
+          </div>
+        </div>
+
+        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+          <div class="flip-inner">
+            <div class="flip-front">Что такое целые числа?<span class="hint-icon">👆</span></div>
+            <div class="flip-back">Натуральные, им противоположные, и нуль.<br><small>Обозначаются $\mathbb{Z}$</small></div>
+          </div>
+        </div>
+
+        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+          <div class="flip-inner">
+            <div class="flip-front">Что такое рациональные числа?<span class="hint-icon">👆</span></div>
+            <div class="flip-back">Числа вида $\dfrac{m}{n}$, где $m$ — целое, $n$ — натуральное.<br><small>Обозначаются $\mathbb{Q}$</small></div>
+          </div>
+        </div>
+
+        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+          <div class="flip-inner">
+            <div class="flip-front">Что такое координатная прямая?<span class="hint-icon">👆</span></div>
+            <div class="flip-back">Прямая, на которой выбрано начало отсчёта, направление и единичный отрезок.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- СЛАЙД 2. РАСПРЕДЕЛИ ЧИСЛА ПО ГРУППАМ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag">Задание 2 · Распредели</span>
+      <h2>Распредели числа по группам</h2>
+      <p class="subtitle">Кликни на число внизу, потом на группу сверху. Потом нажми «Проверить».</p>
+    </div>
+    <div class="content">
+
+      <div class="groups-layout">
+
+        <div class="groups-baskets">
+
+          <div class="basket" data-group="natural">
+            <div class="basket-title" style="color:#166534;">Натуральные</div>
+            <div class="basket-drop"></div>
+          </div>
+
+          <div class="basket" data-group="integer-neg">
+            <div class="basket-title" style="color:#991b1b;">Целые отрицательные</div>
+            <div class="basket-drop"></div>
+          </div>
+
+          <div class="basket" data-group="fraction">
+            <div class="basket-title" style="color:#c2410c;">Обыкновенные дроби</div>
+            <div class="basket-drop"></div>
+          </div>
+
+          <div class="basket" data-group="decimal">
+            <div class="basket-title" style="color:#1e40af;">Десятичные дроби</div>
+            <div class="basket-drop"></div>
+          </div>
+
+        </div>
+
+        <div class="pool-label">Числа</div>
+        <div class="pool" id="pool">
+
+          <div class="num-chip" data-num="5" data-correct="natural">$5$</div>
+          <div class="num-chip" data-num="12" data-correct="natural">$12$</div>
+          <div class="num-chip" data-num="-3" data-correct="integer-neg">$-3$</div>
+          <div class="num-chip" data-num="-7" data-correct="integer-neg">$-7$</div>
+          <div class="num-chip" data-num="3/4" data-correct="fraction">$\dfrac{3}{4}$</div>
+          <div class="num-chip" data-num="2/7" data-correct="fraction">$\dfrac{2}{7}$</div>
+          <div class="num-chip" data-num="0.25" data-correct="decimal">$0{,}25$</div>
+          <div class="num-chip" data-num="-1.5" data-correct="decimal">$-1{,}5$</div>
+
+        </div>
+
+        <div class="group-actions">
+          <button class="check-groups-btn" onclick="checkGroups()">✓ Проверить</button>
+          <button class="reset-groups-btn" onclick="resetGroups()">↺ Сбросить</button>
+        </div>
+        <div class="groups-result" id="groupsResult"></div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- СЛАЙД 3. КООРДИНАТНАЯ ПРЯМАЯ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag">Задание 3 · Отметь на прямой</span>
+      <h2>Где находится число на координатной прямой?</h2>
+      <p class="subtitle">Определи, между какими целыми числами лежит каждая точка.</p>
+    </div>
+    <div class="content">
+      <div class="line-layout">
+
+        <div class="number-line">
+          <svg viewBox="0 0 700 120" xmlns="http://www.w3.org/2000/svg">
+            <line x1="20" y1="60" x2="680" y2="60" stroke="#334155" stroke-width="2"/>
+            <polygon points="678,60 668,55 668,65" fill="#334155"/>
+
+            <g font-size="14" font-family="Segoe UI" fill="#334155" font-weight="bold" text-anchor="middle">
+              <circle cx="100" cy="60" r="3" fill="#334155"/>
+              <text x="100" y="85">−4</text>
+              <circle cx="180" cy="60" r="3" fill="#334155"/>
+              <text x="180" y="85">−3</text>
+              <circle cx="260" cy="60" r="3" fill="#334155"/>
+              <text x="260" y="85">−2</text>
+              <circle cx="340" cy="60" r="3" fill="#334155"/>
+              <text x="340" y="85">−1</text>
+              <circle cx="420" cy="60" r="3" fill="#334155"/>
+              <text x="420" y="85">0</text>
+              <circle cx="500" cy="60" r="3" fill="#334155"/>
+              <text x="500" y="85">1</text>
+              <circle cx="580" cy="60" r="3" fill="#334155"/>
+              <text x="580" y="85">2</text>
+              <circle cx="660" cy="60" r="3" fill="#334155"/>
+              <text x="660" y="85">3</text>
+            </g>
+
+            <circle cx="460" cy="60" r="7" fill="#ea580c" stroke="#fff" stroke-width="2"/>
+            <text x="460" y="42" font-size="14" fill="#ea580c" font-weight="bold" text-anchor="middle">A</text>
+
+            <circle cx="300" cy="60" r="7" fill="#2563eb" stroke="#fff" stroke-width="2"/>
+            <text x="300" y="42" font-size="14" fill="#2563eb" font-weight="bold" text-anchor="middle">B</text>
+
+            <circle cx="620" cy="60" r="7" fill="#16a34a" stroke="#fff" stroke-width="2"/>
+            <text x="620" y="42" font-size="14" fill="#16a34a" font-weight="bold" text-anchor="middle">C</text>
+
+            <circle cx="140" cy="60" r="7" fill="#9f1239" stroke="#fff" stroke-width="2"/>
+            <text x="140" y="42" font-size="14" fill="#9f1239" font-weight="bold" text-anchor="middle">D</text>
+          </svg>
+        </div>
+
+        <div class="line-tasks">
+          <div class="line-task" data-answer="0..1" onclick="checkLineTask(this, '0..1')">
+            <span class="task-num">A</span>
+            <span class="task-text">Между какими целыми числами?</span>
+          </div>
+          <div class="line-task" data-answer="-2..-1" onclick="checkLineTask(this, '-2..-1')">
+            <span class="task-num">B</span>
+            <span class="task-text">Между какими целыми числами?</span>
+          </div>
+          <div class="line-task" data-answer="2..3" onclick="checkLineTask(this, '2..3')">
+            <span class="task-num">C</span>
+            <span class="task-text">Между какими целыми числами?</span>
+          </div>
+          <div class="line-task" data-answer="-4..-3" onclick="checkLineTask(this, '-4..-3')">
+            <span class="task-num">D</span>
+            <span class="task-text">Между какими целыми числами?</span>
+          </div>
+          <div class="result-msg" id="line-result"></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- СЛАЙД 4. БЫСТРЫЙ СЧЁТ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag">Задание 4 · Переведи дробь</span>
+      <h2>Обыкновенная дробь → десятичная</h2>
+      <p class="subtitle">Представь дробь в виде десятичной. Введи ответ и нажми Enter.</p>
+    </div>
+    <div class="content">
+      <div class="input-grid">
+
+        <div class="input-card" data-answer="0.5">
+          <div class="point">$\dfrac{1}{2}$</div>
+          <div class="text">Запиши в виде десятичной дроби</div>
+          <div class="row">= <input type="text" data-k="0.5" onchange="checkInput(this)"></div>
+        </div>
+
+        <div class="input-card" data-answer="0.25">
+          <div class="point">$\dfrac{1}{4}$</div>
+          <div class="text">Запиши в виде десятичной дроби</div>
+          <div class="row">= <input type="text" data-k="0.25" onchange="checkInput(this)"></div>
+        </div>
+
+        <div class="input-card" data-answer="0.75">
+          <div class="point">$\dfrac{3}{4}$</div>
+          <div class="text">Запиши в виде десятичной дроби</div>
+          <div class="row">= <input type="text" data-k="0.75" onchange="checkInput(this)"></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<nav>
+  <button class="nav-prev" id="navPrev" onclick="changeSlide(-1)" disabled>← Назад</button>
+  <div class="nav-info" id="navInfo">Слайд 1 из 4</div>
+  <button class="nav-next" id="navNext" onclick="changeSlide(1)">Далее →</button>
+</nav>
+
+<script>
+var current = 0;
+var slides = document.querySelectorAll('.slide');
+var total = slides.length;
+var prevBtn = document.getElementById('navPrev');
+var nextBtn = document.getElementById('navNext');
+var navInfo = document.getElementById('navInfo');
+var pills = document.querySelectorAll('.progress-pill');
+
+function showSlide(i){
+  slides.forEach(function(s, idx){ s.classList.toggle('active', idx === i); });
+  pills.forEach(function(p, idx){
+    p.classList.toggle('active', idx === i);
+    p.classList.toggle('done', idx < i);
+  });
+  prevBtn.disabled = (i === 0);
+  nextBtn.disabled = (i === total - 1);
+  navInfo.textContent = 'Слайд ' + (i + 1) + ' из ' + total;
+  renderMath();
+}
+
+function changeSlide(dir){
+  current = Math.min(Math.max(current + dir, 0), total - 1);
+  showSlide(current);
+}
+
+pills.forEach(function(p, idx){
+  p.addEventListener('click', function(){
+    current = idx;
+    showSlide(current);
+  });
+});
+
+function renderMath(){
+  if(window.MathJax && MathJax.typesetPromise){
+    MathJax.typesetPromise().catch(function(err){ console.log('MathJax error:', err); });
+  }
+}
+
+/* РАСПРЕДЕЛИ ЧИСЛА ПО ГРУППАМ */
+var selectedChip = null;
+
+document.querySelectorAll('.num-chip').forEach(function(chip){
+  chip.addEventListener('click', function(e){
+    e.stopPropagation();
+    if(chip.classList.contains('in-basket')){
+      var pool = document.getElementById('pool');
+      chip.classList.remove('in-basket','correct-answer','wrong-answer');
+      pool.appendChild(chip);
+      renderMath();
+      return;
+    }
+    document.querySelectorAll('.num-chip.selected').forEach(function(c){
+      c.classList.remove('selected');
+    });
+    chip.classList.add('selected');
+    selectedChip = chip;
+  });
+});
+
+document.querySelectorAll('.basket').forEach(function(basket){
+  basket.addEventListener('click', function(){
+    if(!selectedChip) return;
+    var drop = basket.querySelector('.basket-drop');
+    selectedChip.classList.remove('selected');
+    selectedChip.classList.add('in-basket');
+    drop.appendChild(selectedChip);
+    selectedChip = null;
+    renderMath();
+  });
+});
+
+function checkGroups(){
+  var allChips = document.querySelectorAll('.num-chip.in-basket');
+  var correct = 0;
+  var res = document.getElementById('groupsResult');
+
+  allChips.forEach(function(chip){
+    var correctGroup = chip.dataset.correct;
+    var parentBasket = chip.closest('.basket');
+    var currentGroup = parentBasket ? parentBasket.dataset.group : null;
+
+    chip.classList.remove('correct-answer','wrong-answer');
+
+    if(currentGroup === correctGroup){
+      chip.classList.add('correct-answer');
+      correct++;
+    } else {
+      chip.classList.add('wrong-answer');
+    }
+  });
+
+  var totalChips = document.querySelectorAll('.num-chip').length;
+  var placed = allChips.length;
+
+  res.classList.add('show');
+  if(placed === 0){
+    res.className = 'groups-result show partial';
+    res.textContent = '⚠️ Сначала распредели хотя бы одно число';
+  } else if(correct === totalChips){
+    res.className = 'groups-result show ok';
+    res.textContent = '🎉 Отлично! Все 8 чисел в своих группах!';
+  } else {
+    res.className = 'groups-result show partial';
+    res.textContent = 'Правильно: ' + correct + ' из ' + totalChips + '. Красные числа — не в своей группе.';
+  }
+}
+
+function resetGroups(){
+  var pool = document.getElementById('pool');
+  document.querySelectorAll('.num-chip').forEach(function(chip){
+    chip.classList.remove('in-basket','correct-answer','wrong-answer','selected');
+    pool.appendChild(chip);
+  });
+  document.getElementById('groupsResult').classList.remove('show');
+  selectedChip = null;
+}
+
+/* КООРДИНАТНАЯ ПРЯМАЯ */
+function checkLineTask(task, answer){
+  var card = task.closest('.line-tasks');
+  var allTasks = card.querySelectorAll('.line-task');
+  var res = document.getElementById('line-result');
+
+  if(task.classList.contains('correct')) return;
+
+  allTasks.forEach(function(t){
+    t.classList.remove('wrong');
+  });
+
+  if(task.dataset.answer === answer){
+    task.classList.add('correct');
+    task.querySelector('.task-text').textContent = '✓ между ' + task.dataset.answer.replace('..', ' и ');
+    var correctCount = card.querySelectorAll('.line-task.correct').length;
+    if(correctCount === 4){
+      res.textContent = '🎉 Все точки определены верно!';
+      res.className = 'result-msg ok';
+    }
+  } else {
+    task.classList.add('wrong');
+    setTimeout(function(){
+      task.classList.remove('wrong');
+    }, 800);
+  }
+}
+
+/* ПРОВЕРКА ВВОДА */
+function checkInput(inp){
+  var card = inp.closest('.input-card');
+  if(card.dataset.answered === 'true') return;
+  var user = inp.value.trim().replace(',', '.').replace('−','-').replace(/\s+/g,'');
+  if(user === '') return;
+  var correct = inp.dataset.k;
+  inp.classList.remove('correct','wrong');
+  card.classList.remove('answered-correct','answered-wrong');
+  if(parseFloat(user) === parseFloat(correct)){
+    inp.classList.add('correct');
+    card.classList.add('answered-correct');
+    card.dataset.answered = 'true';
+  } else {
+    inp.classList.add('wrong');
+    card.classList.add('answered-wrong');
+    setTimeout(function(){
+      inp.classList.remove('wrong');
+      card.classList.remove('answered-wrong');
+    }, 1000);
+  }
+}
+
+document.querySelectorAll('.input-card input').forEach(function(inp){
+  inp.addEventListener('keydown', function(e){
+    if(e.key === 'Enter') inp.blur();
+  });
+});
+
+window.addEventListener('load', function(){
+  showSlide(0);
+  renderMath();
+  setTimeout(renderMath, 500);
+  setTimeout(renderMath, 1500);
+});
+</script>
+
+</body>
+</html>
