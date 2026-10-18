@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Основной урок · Квадратный корень: закрепление</title>
+<script>
+MathJax = { tex: {inlineMath: [['$','$'],['\\(','\\)']]}, svg: {fontCache: 'global'} };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root{
+    --orange:#ea580c;--orange-dark:#c2410c;--orange-light:#ffedd5;
+    --amber:#f59e0b;--amber-dark:#d97706;--amber-light:#fef3c7;
+    --ok:#10b981;--ok-light:#d1fae5;--err:#ef4444;--err-light:#fee2e2;
+    --blue:#2563eb;--blue-dark:#1e40af;--blue-light:#dbeafe;
+    --green:#16a34a;--green-light:#dcfce7;
+    --pink:#ec4899;--pink-dark:#9f1239;--pink-light:#fce7f3;
+    --text:#1e293b;--muted:#78716c;--border:#fed7aa;
+  }
+  *{box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif;}
+  html,body{margin:0;padding:0;height:100%;overflow:hidden;}
+  body{
+    background:
+      radial-gradient(1400px 700px at 5% -5%, #ffedd5 0%, transparent 55%),
+      radial-gradient(1000px 600px at 100% 100%, #fef3c7 0%, transparent 55%),
+      #fffbf5;
+    color:var(--text);height:100vh;display:flex;flex-direction:column;position:relative;
+  }
+  .bg-leaf{position:fixed;pointer-events:none;z-index:0;user-select:none;}
+  .bg-leaf.l1{top:6%;left:3%;transform:rotate(-25deg);font-size:80px;opacity:.14;}
+  .bg-leaf.l2{top:35%;right:4%;transform:rotate(35deg);font-size:110px;opacity:.1;}
+  .bg-leaf.l3{bottom:10%;left:10%;transform:rotate(15deg);font-size:90px;opacity:.12;}
+  .bg-leaf.l4{bottom:5%;right:15%;transform:rotate(-45deg);font-size:70px;opacity:.13;}
+  .bg-leaf.l5{top:15%;right:35%;transform:rotate(-10deg);font-size:60px;opacity:.11;}
+  .bg-leaf.l6{bottom:40%;left:40%;transform:rotate(120deg);font-size:70px;opacity:.09;}
+  .bg-leaf.l7{top:70%;left:2%;transform:rotate(60deg);font-size:65px;opacity:.1;}
+  .bg-leaf.l8{top:5%;right:8%;transform:rotate(-60deg);font-size:80px;opacity:.12;}
+
+  header{
+    padding:8px 20px;display:flex;justify-content:space-between;align-items:center;
+    background:rgba(255,251,245,.85);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px;
+    position:relative;z-index:10;flex-shrink:0;
+  }
+  .header-title{font-size:12px;font-weight:800;color:var(--orange-dark);}
+  .header-title span{color:var(--muted);font-weight:600;margin-left:6px;}
+  .progress-pills{display:flex;gap:3px;align-items:center;flex-wrap:wrap;}
+  .progress-pill{
+    height:22px;min-width:22px;padding:0 7px;border-radius:11px;
+    background:#fff;border:2px solid var(--border);
+    display:flex;align-items:center;justify-content:center;
+    font-size:9px;font-weight:800;color:var(--muted);cursor:pointer;
+  }
+  .progress-pill:hover{border-color:var(--orange);color:var(--orange);}
+  .progress-pill.active{background:linear-gradient(135deg,var(--orange),var(--amber));color:#fff;border-color:transparent;}
+  .progress-pill.done{background:var(--ok-light);color:var(--ok);border-color:var(--ok);}
+  .progress-pill.theory{background:var(--blue-light);color:var(--blue-dark);border-color:#93c5fd;}
+  .progress-pill.theory.active{background:linear-gradient(135deg,var(--blue),#1d4ed8);color:#fff;border-color:transparent;}
+  .progress-pill.theory.done{background:#bfdbfe;color:var(--blue-dark);}
+
+  main{flex:1;padding:14px 20px 80px;display:flex;justify-content:center;position:relative;z-index:5;overflow:hidden;min-height:0;}
+  .slide{
+    display:none;background:#fffdf9;border-radius:18px;
+    padding:16px 26px;box-shadow:0 12px 40px rgba(234,88,12,.12);
+    border:1px solid var(--border);width:100%;max-width:1600px;
+    animation:fade .4s ease;position:relative;overflow:hidden;height:100%;flex-direction:column;
+  }
+  .slide.active{display:flex;}
+  @keyframes fade{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+  .slide::before{content:'';position:absolute;top:-50px;right:-50px;width:160px;height:160px;background:radial-gradient(circle,rgba(254,215,170,.5) 0%,transparent 70%);pointer-events:none;}
+  .slide::after{content:'🌿';position:absolute;bottom:-15px;right:20px;font-size:90px;opacity:.05;transform:rotate(-20deg);pointer-events:none;}
+
+  .slide-header{flex-shrink:0;margin-bottom:10px;position:relative;z-index:2;}
+  .slide-tag{
+    display:inline-block;background:var(--amber-light);color:var(--amber-dark);
+    padding:3px 10px;border-radius:14px;font-size:10px;font-weight:700;margin-bottom:4px;
+    border:1px solid rgba(245,158,11,.3);
+  }
+  .slide-tag.theory-tag{background:var(--blue-light);color:var(--blue-dark);border-color:#93c5fd;}
+  .slide-tag.result-tag{background:var(--green-light);color:#166534;border-color:#86efac;}
+  .slide h2{font-size:20px;margin:0 0 2px;color:var(--orange-dark);font-weight:800;letter-spacing:-.3px;}
+  .slide h2.blue{color:var(--blue-dark);}
+  .slide h2.green{color:#166534;}
+  .slide .subtitle{color:var(--muted);font-size:12px;margin:0;line-height:1.4;}
+
+  .content{flex:1;display:flex;flex-direction:column;gap:12px;position:relative;z-index:2;min-height:0;overflow:hidden;}
+  .content.center{align-items:center;justify-content:center;}
+
+  .theory-block{
+    background:#fff;border:2px solid var(--border);border-radius:12px;
+    padding:18px 24px;position:relative;
+  }
+  .theory-block h3{margin:0 0 12px;font-size:18px;color:var(--blue-dark);font-weight:800;}
+  .theory-block p{font-size:16px;line-height:1.75;margin:8px 0;}
+
+  .formula-highlight{
+    background:linear-gradient(135deg,#ffedd5,#fed7aa);
+    border:2px solid var(--orange);border-radius:12px;
+    padding:14px 22px;text-align:center;font-size:26px;
+    font-weight:700;color:var(--orange-dark);margin:10px 0;
+  }
+  .formula-highlight.blue{background:linear-gradient(135deg,#dbeafe,#bfdbfe);border-color:var(--blue);color:var(--blue-dark);}
+  .formula-highlight.big{font-size:34px;padding:20px 30px;}
+
+  .key-idea{
+    background:linear-gradient(135deg,#fef3c7,#fde68a);
+    border-left:5px solid var(--amber-dark);border-radius:12px;
+    padding:14px 20px;font-size:15px;line-height:1.65;margin:8px 0;
+  }
+  .key-idea b{color:var(--amber-dark);}
+  .key-idea.blue{background:linear-gradient(135deg,#dbeafe,#bfdbfe);border-left-color:var(--blue-dark);}
+  .key-idea.blue b{color:var(--blue-dark);}
+
+  .static-grid{
+    flex:1;display:grid;grid-template-columns:repeat(3, 1fr);
+    gap:14px;min-height:0;
+  }
+  .static-grid-4{grid-template-columns:repeat(4, 1fr); grid-template-rows:repeat(2, 1fr);}
+  .static-cell{
+    background:#fff;border:2px dashed var(--amber);border-radius:12px;
+    padding:10px 12px;position:relative;display:flex;flex-direction:column;
+    gap:8px;min-height:0;overflow:hidden;
+  }
+  .static-cell::before{
+    content:'✏️ Решение';position:absolute;top:-10px;left:14px;
+    background:#fff;padding:0 8px;font-size:9.5px;font-weight:800;
+    color:var(--amber-dark);letter-spacing:.5px;text-transform:uppercase;border-radius:5px;
+  }
+  .static-cell .static-head{display:flex;align-items:flex-start;gap:8px;flex-shrink:0;}
+  .static-cell .static-letter{
+    display:inline-flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,var(--orange),var(--amber));
+    color:#fff;font-weight:800;font-size:12px;
+    width:26px;height:26px;border-radius:8px;flex-shrink:0;
+  }
+  .static-cell .static-expr{
+    background:rgba(255,247,237,.95);border-radius:7px;padding:6px 10px;
+    font-size:15px;font-weight:600;border:1px solid rgba(234,88,12,.15);
+    flex:1;line-height:1.5;
+  }
+  .static-cell .static-work{
+    flex:1;border-radius:8px;
+    background:
+      linear-gradient(#fed7aa 1px, transparent 1px),
+      linear-gradient(90deg, #fed7aa 1px, transparent 1px);
+    background-size:18px 18px;min-height:80px;
+    border:1px solid rgba(245,158,11,.15);
+  }
+
+  nav{
+    position:fixed;bottom:0;left:0;right:0;padding:8px 20px;
+    background:rgba(255,251,245,.9);backdrop-filter:blur(10px);
+    border-top:1px solid var(--border);display:flex;justify-content:space-between;
+    align-items:center;gap:12px;z-index:100;
+  }
+  nav button{padding:8px 20px;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;}
+  nav .nav-prev{background:#fff;color:var(--orange);border:2px solid var(--orange);}
+  nav .nav-prev:hover:not(:disabled){background:var(--orange-light);}
+  nav .nav-next{background:linear-gradient(135deg,var(--orange),var(--amber));color:#fff;}
+  nav button:disabled{opacity:.4;cursor:not-allowed;}
+  nav .nav-info{font-size:12px;font-weight:700;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<span class="bg-leaf l1">🌿</span>
+<span class="bg-leaf l2">🍃</span>
+<span class="bg-leaf l3">🌱</span>
+<span class="bg-leaf l4">🌿</span>
+<span class="bg-leaf l5">🍃</span>
+<span class="bg-leaf l6">🌱</span>
+<span class="bg-leaf l7">🌿</span>
+<span class="bg-leaf l8">🍃</span>
+
+<header>
+  <div class="header-title">Основной урок · Урок 2 <span>· Квадратный корень: закрепление</span></div>
+  <div class="progress-pills">
+    <div class="progress-pill theory active" data-slide="0">1</div>
+    <div class="progress-pill theory" data-slide="1">2</div>
+    <div class="progress-pill theory" data-slide="2">3</div>
+    <div class="progress-pill theory" data-slide="3">4</div>
+    <div class="progress-pill" data-slide="4">5</div>
+    <div class="progress-pill" data-slide="5">6</div>
+    <div class="progress-pill" data-slide="6">7</div>
+    <div class="progress-pill" data-slide="7">8</div>
+    <div class="progress-pill theory" data-slide="8">9</div>
+    <div class="progress-pill theory" data-slide="9">10</div>
+    <div class="progress-pill" data-slide="10">11</div>
+    <div class="progress-pill" data-slide="11">12</div>
+    <div class="progress-pill" data-slide="12">13</div>
+    <div class="progress-pill" data-slide="13">14</div>
+    <div class="progress-pill" data-slide="14">15</div>
+    <div class="progress-pill" data-slide="15">16</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- 1. ТИТУЛ -->
+  <section class="slide active">
+    <div class="content center">
+      <div style="text-align:center;">
+        <span class="slide-tag theory-tag">Закрепление темы</span>
+        <h2 style="font-size:44px;margin:18px 0 8px;">Арифметический квадратный корень</h2>
+        <p style="font-size:19px;color:var(--muted);margin:0 0 34px;">Учимся извлекать, сравнивать и решать уравнения</p>
+        <div class="formula-highlight big" style="display:inline-block;">$\sqrt{a} = b \Leftrightarrow b \geq 0, b^2 = a$</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. ТЕОРИЯ: ДОКАЗАТЕЛЬСТВО -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag theory-tag">Теория · Как оформлять</span>
+      <h2 class="blue">С помощью определения докажите, что...</h2>
+    </div>
+    <div class="content center">
+      <div class="theory-block" style="max-width:900px;width:100%;">
+        <h3>Как доказать, что $\sqrt{a} = b$?</h3>
+        <p>Нужно проверить <b>два условия</b> из определения арифметического корня:</p>
+        <p>1. Число $b$ должно быть <b>неотрицательным</b> ($b \geq 0$).</p>
+        <p>2. Квадрат числа $b$ должен быть равен $a$ ($b^2 = a$).</p>
+      </div>
+      <div class="key-idea blue" style="max-width:900px;width:100%;">
+        <b>Пример:</b> Докажем, что $\sqrt{1{,}96} = 1{,}4$.<br>
+        1) $1{,}4 \geq 0$ — верно.<br>
+        2) $1{,}4^2 = 1{,}96$ — верно.<br>
+        Значит, по определению $\sqrt{1{,}96} = 1{,}4$. Ч.т.д.
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. ПРАКТИКА: ДОКАЖИ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag result-tag">Практика</span>
+      <h2 class="green">Докажите с помощью определения</h2>
+      <p class="subtitle">Запиши проверку двух условий в клетчатом поле.</p>
+    </div>
+    <div class="content">
+      <div class="static-grid">
+        <div class="static-cell"><div class="static-head"><span class="static-letter">а</span><div class="static-expr">$\sqrt{121} = 11$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">б</span><div class="static-expr">$\sqrt{1} = 1$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">в</span><div class="static-expr">$\sqrt{1{,}96} = 1{,}4$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">г</span><div class="static-expr">$\sqrt{\dfrac{25}{36}} = \dfrac{5}{6}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">д</span><div class="static-expr">$\sqrt{3\dfrac{1}{16}} = 1\dfrac{3}{4}$</div></div><div class="static-work"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. ПРАКТИКА: ИЗВЛЕЧЕНИЕ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag result-tag">Практика · 1.10, 1.11</span>
+      <h2 class="green">Найдите значение корня</h2>
+      <p class="subtitle">Извлекаем корни из чисел, дробей и смешанных чисел.</p>
+    </div>
+    <div class="content">
+      <div class="static-grid static-grid-4">
+        <div class="static-cell"><div class="static-head"><span class="static-letter">а</span><div class="static-expr">$\sqrt{900}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">б</span><div class="static-expr">$\sqrt{250\,000}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">в</span><div class="static-expr">$\sqrt{0{,}04}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">г</span><div class="static-expr">$\sqrt{\dfrac{9}{49}}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">д</span><div class="static-expr">$\sqrt{2\dfrac{1}{4}}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">е</span><div class="static-expr">$\sqrt{5\dfrac{4}{9}}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">ж</span><div class="static-expr">$\sqrt{4\dfrac{21}{25}}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">з</span><div class="static-expr">$\sqrt{\dfrac{225}{49}}$</div></div><div class="static-work"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. ПРАКТИКА: ПОДСТАНОВКА -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag result-tag">Практика · 1.12</span>
+      <h2 class="green">Найдите значение выражения $a - \sqrt{a}$</h2>
+      <p class="subtitle">Подставь значение $a$ и вычисли.</p>
+    </div>
+    <div class="content">
+      <div class="static-grid static-grid-4">
+        <div class="static-cell"><div class="static-head"><span class="static-letter">а</span><div class="static-expr">$a = 25$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">б</span><div class="static-expr">$a = 1600$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">в</span><div class="static-expr">$a = 0{,}49$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">г</span><div class="static-expr">$a = 1{,}21$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">д</span><div class="static-expr">$a = \dfrac{4}{9}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">е</span><div class="static-expr">$a = 1\dfrac{11}{25}$</div></div><div class="static-work"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. ТЕОРИЯ: КАК СРАВНИВАТЬ КОРНИ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag theory-tag">Теория · Сравнение</span>
+      <h2 class="blue">Как сравнивать числа с корнями?</h2>
+    </div>
+    <div class="content center">
+      <div class="theory-block" style="max-width:900px;width:100%;">
+        <h3>Правило 1. Сравнение двух корней</h3>
+        <p>Если нужно сравнить $\sqrt{a}$ и $\sqrt{b}$, сравниваем их <b>подкоренные выражения</b>:</p>
+        <div class="formula-highlight">Если $a > b$, то $\sqrt{a} > \sqrt{b}$</div>
+        <p><small>Пример: $\sqrt{7} < \sqrt{10}$, так как $7 < 10$.</small></p>
+      </div>
+      <div class="theory-block" style="max-width:900px;width:100%;">
+        <h3>Правило 2. Сравнение корня и обычного числа</h3>
+        <p>Чтобы сравнить $\sqrt{a}$ и число $c$, нужно <b>возвести число $c$ в квадрат</b> и сравнить с $a$:</p>
+        <div class="formula-highlight">Сравниваем $\sqrt{a}$ и $c \Rightarrow$ сравниваем $a$ и $c^2$</div>
+        <p><small>Пример: сравним $\sqrt{16}$ и $5$. $5^2 = 25$. Так как $16 < 25$, то $\sqrt{16} < 5$.</small></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. ПРАКТИКА: СРАВНЕНИЕ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag result-tag">Практика · 1.14</span>
+      <h2 class="green">Сравните числа</h2>
+      <p class="subtitle">Поставь знак $&lt;$, $&gt;$ или $=$. Используй правила со слайда выше.</p>
+    </div>
+    <div class="content">
+      <div class="static-grid static-grid-4">
+        <div class="static-cell"><div class="static-head"><span class="static-letter">а</span><div class="static-expr">$\sqrt{121}$ и $\sqrt{100}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">б</span><div class="static-expr">$\sqrt{625}$ и $\sqrt{676}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">в</span><div class="static-expr">$\sqrt{16}$ и $8$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">г</span><div class="static-expr">$\dfrac{1}{6}$ и $\sqrt{0{,}36}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">д</span><div class="static-expr">$1$ и $\sqrt{1\dfrac{7}{9}}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">е</span><div class="static-expr">$\dfrac{1}{2}$ и $\sqrt{\dfrac{25}{81}}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">ж</span><div class="static-expr">$\sqrt{0{,}16}$ и $\sqrt{\dfrac{4}{25}}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">з</span><div class="static-expr">$\sqrt{2{,}25}$ и $\sqrt{1\dfrac{15}{49}}$</div></div><div class="static-work"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. ТЕОРИЯ: СЛОЖЕНИЕ И ВЫЧИТАНИЕ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag theory-tag">Теория · Сложение</span>
+      <h2 class="blue">Как складывать и вычитать корни?</h2>
+    </div>
+    <div class="content center">
+      <div class="theory-block" style="max-width:900px;width:100%;">
+        <h3>Главное правило</h3>
+        <p>Складывать и вычитать корни можно, только если <b>под корнем одинаковые числа</b> (подобные слагаемые).</p>
+        <div class="formula-highlight">$a\sqrt{x} + b\sqrt{x} = (a + b)\sqrt{x}$</div>
+        <p>Сначала всегда <b>извлекаем корень</b>, если это возможно, и только потом выполняем действия.</p>
+      </div>
+      <div class="key-idea blue" style="max-width:900px;width:100%;">
+        <b>Пример 1:</b> $\sqrt{36} + \sqrt{49} = 6 + 7 = 13$.<br>
+        <b>Пример 2:</b> $\sqrt{100} - \sqrt{64} = 10 - 8 = 2$.<br>
+        <b>Внимание:</b> $\sqrt{9} + \sqrt{16} = 3 + 4 = 7$, а <b>не</b> $\sqrt{25} = 5$!
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. ПРАКТИКА: СЛОЖЕНИЕ/ВЫЧИТАНИЕ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag result-tag">Практика · 1.15</span>
+      <h2 class="green">Найдите значение выражения</h2>
+      <p class="subtitle">Сначала извлеки корни, затем сложи или вычти.</p>
+    </div>
+    <div class="content">
+      <div class="static-grid static-grid-3">
+        <div class="static-cell"><div class="static-head"><span class="static-letter">а</span><div class="static-expr">$\sqrt{36} + \sqrt{49}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">б</span><div class="static-expr">$\sqrt{100} - \sqrt{64}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">в</span><div class="static-expr">$\sqrt{0{,}09} + \sqrt{0{,}01}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">г</span><div class="static-expr">$\sqrt{2{,}25} - \sqrt{2{,}56}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">д</span><div class="static-expr">$\sqrt{25} + \sqrt{\dfrac{1}{9}}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">е</span><div class="static-expr">$-\sqrt{64} - \sqrt{\dfrac{1}{16}}$</div></div><div class="static-work"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. ПРАКТИКА: СЛОЖНЫЕ ВЫРАЖЕНИЯ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag result-tag">Практика · 1.18</span>
+      <h2 class="green">Вычислите</h2>
+      <p class="subtitle">Порядок действий: сначала корень, потом умножение/деление, потом сложение.</p>
+    </div>
+    <div class="content">
+      <div class="static-grid static-grid-3">
+        <div class="static-cell"><div class="static-head"><span class="static-letter">а</span><div class="static-expr">$2\sqrt{64} + \sqrt{25}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">б</span><div class="static-expr">$\sqrt{81} - \dfrac{1}{3}\sqrt{144}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">в</span><div class="static-expr">$-\dfrac{1}{\sqrt{0{,}0025}}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">г</span><div class="static-expr">$\dfrac{1}{\sqrt{0{,}04}} + 5\sqrt{0{,}16}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">д</span><div class="static-expr">$15 \cdot \sqrt{\dfrac{49}{81}} \cdot \sqrt{\dfrac{9}{25}}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">е</span><div class="static-expr">$18 : \sqrt{81}$</div></div><div class="static-work"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11. ТЕОРИЯ: УРАВНЕНИЯ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag theory-tag">Теория · Уравнения</span>
+      <h2 class="blue">Как решать уравнения $\sqrt{x} = a$?</h2>
+    </div>
+    <div class="content center">
+      <div class="theory-block" style="max-width:900px;width:100%;">
+        <h3>Правило</h3>
+        <p>Чтобы решить уравнение $\sqrt{x} = a$, нужно возвести обе части в квадрат: $x = a^2$.</p>
+        <p><b>Важно:</b> по определению арифметического корня <b>правая часть не может быть отрицательной</b>.</p>
+        <div class="formula-highlight">Если $a < 0$, то уравнение $\sqrt{x} = a$ <b>не имеет корней</b>.</div>
+      </div>
+      <div class="key-idea blue" style="max-width:900px;width:100%;">
+        <b>Пример 1:</b> $\sqrt{x} = 7 \Rightarrow x = 7^2 = 49$.<br>
+        <b>Пример 2:</b> $\sqrt{x} = -4 \Rightarrow$ нет корней.
+      </div>
+    </div>
+  </section>
+
+  <!-- 12. ПРАКТИКА: УРАВНЕНИЯ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag result-tag">Практика · Уравнения</span>
+      <h2 class="green">Решите уравнения</h2>
+      <p class="subtitle">Возведи обе части в квадрат. Помни про ограничение!</p>
+    </div>
+    <div class="content">
+      <div class="static-grid static-grid-4">
+        <div class="static-cell"><div class="static-head"><span class="static-letter">1</span><div class="static-expr">$\sqrt{x} = 7$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">2</span><div class="static-expr">$\sqrt{x} = 9$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">3</span><div class="static-expr">$\sqrt{x} = 1{,}5$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">4</span><div class="static-expr">$\sqrt{x} = \dfrac{2}{5}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">5</span><div class="static-expr">$\sqrt{x} = 0$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">6</span><div class="static-expr">$\sqrt{x} = 0{,}8$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">7</span><div class="static-expr">$\sqrt{x} = -4$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">8</span><div class="static-expr">$\sqrt{x} = \dfrac{1}{3}$</div></div><div class="static-work"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13. ПРАКТИКА: ПРОДОЛЖЕНИЕ СЛОЖНЫХ ВЫРАЖЕНИЙ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag result-tag">Практика · 1.18 (продолжение)</span>
+      <h2 class="green">Вычислите</h2>
+      <p class="subtitle">Сложные выражения с дробями.</p>
+    </div>
+    <div class="content">
+      <div class="static-grid static-grid-3">
+        <div class="static-cell"><div class="static-head"><span class="static-letter">ж</span><div class="static-expr">$15 \cdot \sqrt{\dfrac{49}{81}} \cdot \sqrt{\dfrac{9}{25}}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">з</span><div class="static-expr">$\dfrac{\sqrt{0{,}01}}{\sqrt{0{,}0001} + \sqrt{0{,}0009}}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">и</span><div class="static-expr">$-\dfrac{\sqrt{2{,}25}}{3\sqrt{0{,}04}}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">к</span><div class="static-expr">$\sqrt{225} \cdot \sqrt{\dfrac{4}{25}}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">л</span><div class="static-expr">$-\sqrt{2{,}56} : \sqrt{256}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">м</span><div class="static-expr">$\sqrt{2\dfrac{46}{49}} \cdot \sqrt{196}$</div></div><div class="static-work"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 14. ТЕОРИЯ: ПОДСТАНОВКА -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag theory-tag">Теория · Подстановка</span>
+      <h2 class="blue">Найдите значения выражений при $x = 1{,}69$, $y = 1{,}44$</h2>
+    </div>
+    <div class="content center">
+      <div class="theory-block" style="max-width:900px;width:100%;">
+        <h3>Как подставлять?</h3>
+        <p>Выражения: $\sqrt{x} - \sqrt{y}$; &nbsp; $\sqrt{x - y}$; &nbsp; $x - \sqrt{y}$; &nbsp; $\sqrt{x} - y$.</p>
+        <p>Сначала извлеки корни из $x$ и $y$, потом подставляй в выражения. <b>Следи за порядком действий!</b></p>
+      </div>
+      <div class="key-idea blue" style="max-width:900px;width:100%;">
+        $\sqrt{1{,}69} = 1{,}3$, &nbsp; $\sqrt{1{,}44} = 1{,}2$.<br>
+        <b>Пример:</b> $\sqrt{x} - \sqrt{y} = 1{,}3 - 1{,}2 = 0{,}1$.
+      </div>
+    </div>
+  </section>
+
+  <!-- 15. ПРАКТИКА: ПОДСТАНОВКА -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag result-tag">Практика · 1.17</span>
+      <h2 class="green">Вычислите при $x = 1{,}69$, $y = 1{,}44$</h2>
+      <p class="subtitle">Подставь значения $x$ и $y$ и найди значение каждого выражения.</p>
+    </div>
+    <div class="content">
+      <div class="static-grid static-grid-4" style="grid-template-rows: 1fr;">
+        <div class="static-cell"><div class="static-head"><span class="static-letter">а</span><div class="static-expr">$\sqrt{x} - \sqrt{y}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">б</span><div class="static-expr">$\sqrt{x - y}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">в</span><div class="static-expr">$x - \sqrt{y}$</div></div><div class="static-work"></div></div>
+        <div class="static-cell"><div class="static-head"><span class="static-letter">г</span><div class="static-expr">$\sqrt{x} - y$</div></div><div class="static-work"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 16. ИТОГ -->
+  <section class="slide">
+    <div class="slide-header">
+      <span class="slide-tag">Итог</span>
+      <h2>Собираем всё вместе</h2>
+    </div>
+    <div class="content center">
+      <div style="display:flex;flex-direction:column;gap:12px;align-items:center;max-width:900px;width:100%;">
+        <div class="theory-block" style="width:100%;text-align:center;">
+          <h3 style="text-align:center;">Что мы закрепили?</h3>
+          <p>✓ Как доказывать корень по определению<br>
+             ✓ Как извлекать корень из больших чисел и дробей<br>
+             ✓ Как сравнивать числа с корнями<br>
+             ✓ Как складывать и вычитать корни<br>
+             ✓ Как решать уравнения вида $\sqrt{x} = a$</p>
+        </div>
+        <div class="key-idea blue" style="width:100%;text-align:center;">
+          <b>Главное правило:</b> корень — это всегда число $\geq 0$. А под корнем — только $\geq 0$.
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<nav>
+  <button class="nav-prev" id="navPrev" onclick="changeSlide(-1)" disabled>← Назад</button>
+  <div class="nav-info" id="navInfo">Слайд 1 из 16</div>
+  <button class="nav-next" id="navNext" onclick="changeSlide(1)">Далее →</button>
+</nav>
+
+<script>
+var current = 0;
+var slides = document.querySelectorAll('.slide');
+var total = slides.length;
+var prevBtn = document.getElementById('navPrev');
+var nextBtn = document.getElementById('navNext');
+var navInfo = document.getElementById('navInfo');
+var pills = document.querySelectorAll('.progress-pill');
+
+function showSlide(i){
+  slides.forEach(function(s, idx){ s.classList.toggle('active', idx === i); });
+  pills.forEach(function(p, idx){
+    p.classList.toggle('active', idx === i);
+    p.classList.toggle('done', idx < i);
+  });
+  prevBtn.disabled = (i === 0);
+  nextBtn.disabled = (i === total - 1);
+  navInfo.textContent = 'Слайд ' + (i + 1) + ' из ' + total;
+  renderMath();
+}
+function changeSlide(dir){
+  current = Math.min(Math.max(current + dir, 0), total - 1);
+  showSlide(current);
+}
+pills.forEach(function(p, idx){
+  p.addEventListener('click', function(){ current = idx; showSlide(current); });
+});
+function renderMath(){
+  if(window.MathJax && MathJax.typesetPromise){
+    MathJax.typesetPromise().catch(function(err){ console.log('MathJax error:', err); });
+  }
+}
+window.addEventListener('load', function(){
+  showSlide(0);
+  renderMath();
+  setTimeout(renderMath, 500);
+  setTimeout(renderMath, 1500);
+});
+</script>
+
+</body>
+</html>
